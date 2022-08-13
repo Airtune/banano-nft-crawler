@@ -1,0 +1,30 @@
+{
+  "name": "banano-nft-crawler",
+  "version": "1.0.0",
+  "description": "Library for crawling across the Banano ledger to trace NFTs.",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "test": "mocha --require ts-node/register ./test/**/*.ts",
+    "testSupplyBlocksCrawler": "mocha --require ts-node/register ./test/supply-blocks-crawler.spec.ts",
+    "testMintBlocksCrawler": "mocha --require ts-node/register ./test/mint-blocks-crawler.spec.ts",
+    "testAssetCrawler": "mocha --require ts-node/register ./test/asset-crawler.spec.ts"
+  },
+  "author": "Airtune",
+  "license": "MIT",
+  "dependencies": {
+    "@bananocoin/bananojs": "^2.4.26",
+    "nano-account-crawler": "git+https://github.com/Airtune/nano-account-crawler.git",
+    "nano-ipfs": "git+https://github.com/Airtune/nano-ipfs.git",
+    "node-fetch": "^2.6.1"
+  },
+  "devDependencies": {
+    "@types/mocha": "^9.0.0",
+    "@types/node": "^16.4.8",
+    "chai": "^4.3.4",
+    "chai-as-promised": "^7.1.1",
+    "mocha": "^9.0.3",
+    "ts-node": "^10.1.0",
+    "typescript": "^4.3.5"
+  }
+}

@@ -24,4 +24,9 @@ Crawls through several accounts if required to trace a single NFT from the mint 
 # See also
 
 These crawlers are extracted from:
+
 https://github.com/Airtune/banano-metanode-nft-ts
+
+Banano NFT protocol specification:
+
+https://github.com/Airtune/73-meta-tokens

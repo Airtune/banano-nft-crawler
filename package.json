@@ -1,6 +1,6 @@
 {
   "name": "banano-nft-crawler",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Library for crawling across the Banano ledger to trace NFTs.",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -14,8 +14,8 @@
   "license": "MIT",
   "dependencies": {
     "@bananocoin/bananojs": "^2.4.26",
-    "nano-account-crawler": "git+https://github.com/Airtune/nano-account-crawler.git",
-    "nano-ipfs": "git+https://github.com/Airtune/nano-ipfs.git",
+    "nano-account-crawler": "^1.0.18",
+    "nano-ipfs": "^1.0.4",
     "node-fetch": "^2.6.1"
   },
   "devDependencies": {
@@ -26,5 +26,6 @@
     "mocha": "^9.0.3",
     "ts-node": "^10.1.0",
     "typescript": "^4.3.5"
-  }
+  },
+  "repository": "https://github.com/Airtune/banano-nft-crawler"
 }

@@ -103,7 +103,10 @@ var SupplyBlocksCrawler = /** @class */ (function () {
                         if (e_1) throw e_1.error;
                         return [7 /*endfinally*/];
                     case 12: return [7 /*endfinally*/];
-                    case 13: return [2 /*return*/, supplyBlocks];
+                    case 13:
+                        this.supplyBlocks = supplyBlocks;
+                        this.metadataRepresentatives = metadataRepresentatives;
+                        return [2 /*return*/, supplyBlocks];
                 }
             });
         });

@@ -13,6 +13,8 @@ import { TAccount } from "./types/banano";
 // Crawler to find all supply blocks by an issuer
 export class SupplyBlocksCrawler {
   private _issuer: string;
+  public supplyBlocks: INanoBlock[];
+  public metadataRepresentatives: TAccount[];
 
   constructor(issuer: string) {
     this._issuer = issuer;
@@ -38,6 +40,9 @@ export class SupplyBlocksCrawler {
       // Cache followedByBlock that is ahead of block in next iteration
       block = followedByBlock;
     }
+
+    this.supplyBlocks = supplyBlocks;
+    this.metadataRepresentatives = metadataRepresentatives;
 
     return supplyBlocks;
   }

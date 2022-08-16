@@ -54,7 +54,7 @@ if (typeof CANCEL_SUPPLY_REPRESENTATIVE !== "string" || !CANCEL_SUPPLY_REPRESENT
   throw Error(`CANCEL_SUPPLY_REPRESENTATIVE must be a valid Banano address`);
 }
 
-import * as bananojs from "@bananocoin/bananojs";
+const bananojs = require("@bananocoin/bananojs");
 // throws error on invalid checksum
 bananojs.getAccountPublicKey(CANCEL_SUPPLY_REPRESENTATIVE);
 bananojs.getAccountPublicKey(SEND_ALL_NFTS_REPRESENTATIVE);

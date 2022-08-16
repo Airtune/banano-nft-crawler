@@ -1,4 +1,4 @@
-import * as bananojs from "@bananocoin/bananojs";
+const bananojs = require("@bananocoin/bananojs");
 import { SUPPLY_HEX_PATTERN } from "./constants";
 import { accountDataType } from "./account-data-type";
 import { TAccount, TBlockHash } from "./types/banano";

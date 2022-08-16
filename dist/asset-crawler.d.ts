@@ -1,0 +1,30 @@
+import { INanoBlock } from "nano-account-crawler/dist/nano-interfaces";
+import { IAssetBlock } from "./interfaces/asset-block";
+import { IAtomicSwapConditions } from "./interfaces/atomic-swap-conditions";
+import { NanoNode } from 'nano-account-crawler/dist/nano-node';
+export declare class AssetCrawler {
+    private _assetChain;
+    private _assetRepresentative;
+    private _metadataRepresentative;
+    private _issuer;
+    private _mintBlock;
+    private _traceLength;
+    activeAtomicSwap: IAssetBlock;
+    activeAtomicSwapDelegation: IAssetBlock;
+    owner: string;
+    locked: boolean;
+    lockedInAccount: string;
+    constructor(issuer: string, mintBlock: INanoBlock);
+    crawl(nanoNode: NanoNode, maxTraceLength?: bigint): Promise<void>;
+    private crawlStep;
+    currentAtomicSwapConditions(): IAtomicSwapConditions | undefined;
+    findSendAtomicSwapBlock(): IAssetBlock | undefined;
+    get assetChain(): IAssetBlock[];
+    get frontier(): IAssetBlock;
+    get previousFrontier(): IAssetBlock;
+    get assetRepresentative(): string;
+    get issuer(): string;
+    get metadataRepresentative(): string;
+    get traceLength(): bigint;
+    set traceLength(len: bigint);
+}

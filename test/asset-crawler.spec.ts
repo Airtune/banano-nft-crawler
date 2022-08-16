@@ -11,7 +11,7 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 describe('AssetCrawler', function () {
-  this.timeout(20000);
+  this.timeout(10000);
   const issuer: TAccount = "ban_1ty5s13h9tg9f57gwsto8njkzejfu9tjasc8a9mn1wujfxib8dj7w54jg3qm";
   const swapIssuer: TAccount = "ban_1swapxh34bjstbc8c5tonbncw5nrc6sgk7h71bxtetty3huiqcj6mja9rxjt";
   let swapMintBlock;
@@ -28,7 +28,7 @@ describe('AssetCrawler', function () {
   it("confirms change#mint > send#asset > receive#asset", async () => {
     const recipient: TAccount = "ban_1twos81eoq9s6d1asht5wwz53m9kw7hkuajad1m4u5otgcsb4qstymquhahf";
     const mintBlockHash = "F61CCF94D6E5CFE9601C436ACC3976AF876D1DA21909FEB88B629BEDEC4DF1EA";
-    const mintBlock = await getBlock(bananode, issuer, mintBlockHash);
+    const mintBlock = await getBlock(bananode, issuer, mintBlockHash).catch((error) => { throw(error) });
     if (mintBlock === undefined) { throw 'undefined mintBlock'; }
     const assetCrawler = new AssetCrawler(issuer, mintBlock);
     await assetCrawler.crawl(bananode).catch((error) => { throw(error) });
@@ -44,10 +44,10 @@ describe('AssetCrawler', function () {
   it("confirms send#mint > receive#asset", async () => {
     const recipient: TAccount = "ban_1twos81eoq9s6d1asht5wwz53m9kw7hkuajad1m4u5otgcsb4qstymquhahf";
     const mintBlockHash = "EFE6CCFDE4FD56E60F302F22DCF41E736F611124E3F463135FDC31769A68B970";
-    const mintBlock = await getBlock(bananode, issuer, mintBlockHash);
+    const mintBlock = await getBlock(bananode, issuer, mintBlockHash).catch((error) => { throw(error) });
     if (mintBlock === undefined) { throw 'undefined mintBlock'; }
     const assetCrawler = new AssetCrawler(issuer, mintBlock);
-    await assetCrawler.crawl(bananode);
+    await assetCrawler.crawl(bananode).catch((error) => { throw(error) });
     const assetFrontier: IAssetBlock = assetCrawler.frontier;
     expect(recipient).to.equal(assetFrontier.account);
     expect(recipient).to.equal(assetFrontier.owner);
@@ -61,10 +61,10 @@ describe('AssetCrawler', function () {
     const recipient: TAccount = "ban_3testz6spgm48ax8kcwah6swo59sroqfn94fqsgq368z7ki44ccg8hhrx3x8";
 
     // sent with send all assets command, received
-    const mintBlock1 = await getBlock(bananode, sendAllIssuer, "698625D8B57D695D45D4597EF5EEBC7DC31B9A706CCA1D26EAA72F8063B6E385");
+    const mintBlock1 = await getBlock(bananode, sendAllIssuer, "698625D8B57D695D45D4597EF5EEBC7DC31B9A706CCA1D26EAA72F8063B6E385").catch((error) => { throw(error) });
     if (mintBlock1 === undefined) { throw 'undefined mintBlock1'; }
     const nft1AssetCrawler = new AssetCrawler(sendAllIssuer, mintBlock1);
-    await nft1AssetCrawler.crawl(bananode);
+    await nft1AssetCrawler.crawl(bananode).catch((error) => { throw(error) });
     const nft1Frontier: IAssetBlock = nft1AssetCrawler.frontier;
     expect(nft1Frontier.owner).to.equal(recipient);
     expect(nft1Frontier.nanoBlock.hash).to.equal("024ACA494596E054C94E86A11C881018F6A0D73B108D1A0D15A66F91ADCEC1D8"); // !!! Manually validate

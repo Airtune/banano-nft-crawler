@@ -2,9 +2,10 @@
   "compilerOptions": {
     "removeComments": false,
     "sourceMap": true,
-    "target": "es5",
+    "target": "ES5",
     "outDir": "dist",
-    "types": ["node", "mocha"]
+    "types": ["node", "mocha"],
+    "declaration": true
   },
-  "include": ["index.ts"]
+  "include": ["src/**/*.ts"]
 }

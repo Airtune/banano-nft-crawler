@@ -1,4 +1,4 @@
-import * as bananojs from "@bananocoin/bananojs";
+const bananojs = require("@bananocoin/bananojs");
 import { NanoIpfs } from 'nano-ipfs';
 
 const publicKeyToAccount = (publicKey) => {

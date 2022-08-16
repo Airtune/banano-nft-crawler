@@ -1,10 +1,12 @@
 {
   "name": "banano-nft-crawler",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Library for crawling across the Banano ledger to trace NFTs.",
-  "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "files": [
+    "dist/**/*.*"
+  ],
   "scripts": {
     "build": "npx tsc --build tsconfig.json",
     "test": "mocha --require ts-node/register ./test/**/*.ts",

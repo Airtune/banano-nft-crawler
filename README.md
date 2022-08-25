@@ -16,10 +16,11 @@ Crawls through several accounts if required to trace a single NFT from the mint 
 
 # TODO
 
-* Move this library and dependencies from GitHub to https://npmjs.com/
-* Generate a pure js build
+* ~~Move this library and dependencies from GitHub to https://npmjs.com/~~
+* ~~Generate a pure js build~~
 * Set module.exports in index.ts
-* Asset caching and continuing from the cache instead of tracing all the way from the mint block every time.
+* Support asset caching and continuing from the cache instead of tracing all the way from the mint block every time.
+* Add usage examples
 
 # See also
 

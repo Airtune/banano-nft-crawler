@@ -26,6 +26,26 @@ describe('SupplyBlocksCrawler', function() {
     expect(supplyBlockHashes1sux).to.include("2999304B6327A0A0A1F81BFE601477A351E2D9EE73F1F6EAF5719F25A7DB2A51");
   });
 
+  it("registers change#supply blocks when starting from the latest supply block despite being invalid when existing metadata representatives are not ignored", async () => {
+    // IPFS CID: QmaP8dJDpmft1B9GnWMH7qyLh2uRfzAFjU7FNc7SmWK1pG
+    const partialSupplyBlocksCrawler = new SupplyBlocksCrawler("ban_1sux9e4wz3drie3csujan6fkdqoi7otumxkcy4gnh4tz1dihp4j7bx46uoes", "2999304B6327A0A0A1F81BFE601477A351E2D9EE73F1F6EAF5719F25A7DB2A51", "1");
+    // manually add existing metadataRepresentatives
+    const partialSupplyBlocks = await partialSupplyBlocksCrawler.crawl(bananode).catch((error) => { throw(error) });
+    const partialSupplyBlockHashes = partialSupplyBlocks.map((supplyBlock) => { return supplyBlock.hash; });
+    expect(partialSupplyBlockHashes).to.include("B64219CA78D3DFE7E5A2770340AABA4B2DBDA367180B21D416EC13D7FC02F11D");
+  });
+
+  it("doesn't register past or invalid change#supply blocks when starting from the latest supply block with existing metadata representatives ignored", async () => {
+    // IPFS CID: QmaP8dJDpmft1B9GnWMH7qyLh2uRfzAFjU7FNc7SmWK1pG
+    const partialSupplyBlocksCrawler = new SupplyBlocksCrawler("ban_1sux9e4wz3drie3csujan6fkdqoi7otumxkcy4gnh4tz1dihp4j7bx46uoes", "2999304B6327A0A0A1F81BFE601477A351E2D9EE73F1F6EAF5719F25A7DB2A51", "1");
+    // manually add existing metadataRepresentatives
+    partialSupplyBlocksCrawler.ignoreMetadataRepresentatives = ['ban_3eqgz3zg96g4kfm6qc549sh9zgeimg4y71s787dy54z788td651onqz3wmdj'];
+    const partialSupplyBlocks = await partialSupplyBlocksCrawler.crawl(bananode).catch((error) => { throw(error) });
+    const partialSupplyBlockHashes = partialSupplyBlocks.map((supplyBlock) => { return supplyBlock.hash; });
+    expect(partialSupplyBlockHashes).to.not.include("2999304B6327A0A0A1F81BFE601477A351E2D9EE73F1F6EAF5719F25A7DB2A51");
+    expect(partialSupplyBlockHashes).to.be.empty;
+  });
+
   it("doesn't register a supply block if it's the frontier block of an account", async () => {
     const supplyBlocksCrawler = new SupplyBlocksCrawler("ban_11nriprqsrt3tag5h1t81s1588noncoseusmuda79u3pcrbydeobtsxun1r1");
     const supplyBlock: INanoBlock[] = await supplyBlocksCrawler.crawl(bananode).catch((error) => { throw(error) });

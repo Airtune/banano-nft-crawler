@@ -8,37 +8,46 @@ import {
   MAX_RPC_ITERATIONS,
   META_PROTOCOL_SUPPORTED_VERSIONS,
 } from "./constants";
-import { TAccount } from "./types/banano";
+import { TAccount, TBlockHash } from "./types/banano";
 
 // Crawler to find all supply blocks by an issuer
 export class SupplyBlocksCrawler {
   private _issuer: string;
+  private _head: TBlockHash;
+  private _offset: string;
+  public ignoreMetadataRepresentatives: TAccount[];
   public supplyBlocks: INanoBlock[];
   public metadataRepresentatives: TAccount[];
+  public frontierCheckedBlock: INanoBlock;
 
-  constructor(issuer: string) {
+  constructor(issuer: string, head: TBlockHash = undefined, offset: string = "0") {
     this._issuer = issuer;
+    this._head = head;
+    this._offset = offset;
+    this.ignoreMetadataRepresentatives ||= [];
   }
 
   async crawl(nanoNode: NanoNode, maxRpcIterations: number = MAX_RPC_ITERATIONS): Promise<INanoBlock[]> {
     // Initialize crawler that crawls forward from account frontier
-    const banCrawler = new NanoAccountForwardCrawler(nanoNode, this._issuer);
+    const banCrawler = new NanoAccountForwardCrawler(nanoNode, this._issuer, this._head, this._offset);
     await banCrawler.initialize();
     banCrawler.maxRpcIterations = maxRpcIterations;
 
     const supplyBlocks: INanoBlock[] = [];
-    let block: INanoBlock = undefined;
+    let frontierCheckedBlock: INanoBlock = undefined;
     const metadataRepresentatives: TAccount[] = [];
 
     // Crawl forward from frontier in issuer account
     for await (const followedByBlock of banCrawler) {
-      if (this.validateSupplyBlock(block, followedByBlock, metadataRepresentatives)) {
-        supplyBlocks.push(block);
+      if (this.validateSupplyBlock(frontierCheckedBlock, followedByBlock, metadataRepresentatives)) {
+        supplyBlocks.push(frontierCheckedBlock);
         metadataRepresentatives.push(followedByBlock.representative as TAccount);
       }
 
       // Cache followedByBlock that is ahead of block in next iteration
-      block = followedByBlock;
+      frontierCheckedBlock = followedByBlock;
+      this._head = frontierCheckedBlock.hash;
+      this._offset = "1";
     }
 
     this.supplyBlocks = supplyBlocks;
@@ -72,6 +81,9 @@ export class SupplyBlocksCrawler {
 
     // Supply block cannot reuse metadata representative
     if (metadataRepresentatives.includes(followedByBlock.representative as TAccount)) {
+      return false;
+    }
+    if (this.ignoreMetadataRepresentatives.includes(followedByBlock.representative as TAccount)) {
       return false;
     }
 

@@ -50,24 +50,29 @@ var supply_1 = require("./block-parsers/supply");
 var constants_1 = require("./constants");
 // Crawler to find all supply blocks by an issuer
 var SupplyBlocksCrawler = /** @class */ (function () {
-    function SupplyBlocksCrawler(issuer) {
+    function SupplyBlocksCrawler(issuer, head, offset) {
+        if (head === void 0) { head = undefined; }
+        if (offset === void 0) { offset = "0"; }
         this._issuer = issuer;
+        this._head = head;
+        this._offset = offset;
+        this.ignoreMetadataRepresentatives || (this.ignoreMetadataRepresentatives = []);
     }
     SupplyBlocksCrawler.prototype.crawl = function (nanoNode, maxRpcIterations) {
         var e_1, _a;
         if (maxRpcIterations === void 0) { maxRpcIterations = constants_1.MAX_RPC_ITERATIONS; }
         return __awaiter(this, void 0, void 0, function () {
-            var banCrawler, supplyBlocks, block, metadataRepresentatives, banCrawler_1, banCrawler_1_1, followedByBlock, e_1_1;
+            var banCrawler, supplyBlocks, frontierCheckedBlock, metadataRepresentatives, banCrawler_1, banCrawler_1_1, followedByBlock, e_1_1;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
-                        banCrawler = new nano_account_forward_crawler_1.NanoAccountForwardCrawler(nanoNode, this._issuer);
+                        banCrawler = new nano_account_forward_crawler_1.NanoAccountForwardCrawler(nanoNode, this._issuer, this._head, this._offset);
                         return [4 /*yield*/, banCrawler.initialize()];
                     case 1:
                         _b.sent();
                         banCrawler.maxRpcIterations = maxRpcIterations;
                         supplyBlocks = [];
-                        block = undefined;
+                        frontierCheckedBlock = undefined;
                         metadataRepresentatives = [];
                         _b.label = 2;
                     case 2:
@@ -78,12 +83,14 @@ var SupplyBlocksCrawler = /** @class */ (function () {
                     case 4:
                         if (!(banCrawler_1_1 = _b.sent(), !banCrawler_1_1.done)) return [3 /*break*/, 6];
                         followedByBlock = banCrawler_1_1.value;
-                        if (this.validateSupplyBlock(block, followedByBlock, metadataRepresentatives)) {
-                            supplyBlocks.push(block);
+                        if (this.validateSupplyBlock(frontierCheckedBlock, followedByBlock, metadataRepresentatives)) {
+                            supplyBlocks.push(frontierCheckedBlock);
                             metadataRepresentatives.push(followedByBlock.representative);
                         }
                         // Cache followedByBlock that is ahead of block in next iteration
-                        block = followedByBlock;
+                        frontierCheckedBlock = followedByBlock;
+                        this._head = frontierCheckedBlock.hash;
+                        this._offset = "1";
                         _b.label = 5;
                     case 5: return [3 /*break*/, 3];
                     case 6: return [3 /*break*/, 13];
@@ -133,6 +140,9 @@ var SupplyBlocksCrawler = /** @class */ (function () {
         }
         // Supply block cannot reuse metadata representative
         if (metadataRepresentatives.includes(followedByBlock.representative)) {
+            return false;
+        }
+        if (this.ignoreMetadataRepresentatives.includes(followedByBlock.representative)) {
             return false;
         }
         // Check if representative is a parsable supply_representative with a supported version

@@ -65,6 +65,16 @@ export class AssetCrawler {
       await assetMintCrawl(nanoNode, this, this._mintBlock).catch((error) => { throw(error) });
     }
 
+    await this.crawlFromFrontier(nanoNode, maxTraceLength);
+  }
+
+  initFromCache(assetRepresentative: string, assetChain: IAssetBlock[], initialTraceLength: bigint = undefined) {
+    this._assetRepresentative = assetRepresentative;
+    this._assetChain = assetChain;
+    this._traceLength = initialTraceLength || this._traceLength;
+  }
+
+  async crawlFromFrontier(nanoNode: NanoNode, maxTraceLength: bigint = MAX_TRACE_LENGTH) {
     let newStep = true;
     while (newStep) {
       newStep = await this.crawlStep(nanoNode).catch((error) => { throw(error) });

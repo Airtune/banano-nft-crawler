@@ -14,11 +14,29 @@ describe('SupplyBlocksCrawler', function() {
   let supplyBlocks1sux: INanoBlock[];
   let supplyBlockHashes1sux: TBlockHash[];
 
+  let supplyBlocksCrawlerMinter: SupplyBlocksCrawler;
+  let supplyBlocksMinter: INanoBlock[];
+  let supplyBlockHashesMinter: TBlockHash[];
+
 
   before("run supplyBlocksCrawler", async () => {
     supplyBlocksCrawler1sux = new SupplyBlocksCrawler("ban_1sux9e4wz3drie3csujan6fkdqoi7otumxkcy4gnh4tz1dihp4j7bx46uoes");
     supplyBlocks1sux = await supplyBlocksCrawler1sux.crawl(bananode).catch((error) => { throw(error) });
     supplyBlockHashes1sux = supplyBlocks1sux.map((supplyBlock) => { return supplyBlock.hash; });
+
+    supplyBlocksCrawlerMinter = new SupplyBlocksCrawler("ban_3mint9uhtn84io1817o7qnxnm1outy7oas3b6b5upg91mw3oghzctpeeqa17");
+    supplyBlocksMinter = await supplyBlocksCrawlerMinter.crawl(bananode).catch((error) => { throw(error) });
+    supplyBlockHashesMinter = supplyBlocksMinter.map((supplyBlock) => { return supplyBlock.hash; });
+  });
+
+  it("crawl partial account history from head", async () => {
+    const supplyBlocksCrawlerPartial = new SupplyBlocksCrawler("ban_3mint9uhtn84io1817o7qnxnm1outy7oas3b6b5upg91mw3oghzctpeeqa17", "2B1C66889A476CE2AABCBC56483B3E7027A43179DBE123225204BCCE02D52115", "1");
+    const supplyBlocksPartial = await supplyBlocksCrawlerPartial.crawl(bananode).catch((error) => { throw(error) });
+    const supplyBlockHashesPartial = supplyBlocksPartial.map((supplyBlock) => { return supplyBlock.hash; });
+
+    expect(supplyBlockHashesPartial.length).to.equal(2);
+    expect(supplyBlockHashesPartial[0]).to.equal(supplyBlockHashesMinter[2]);
+    expect(supplyBlockHashesPartial[1]).to.equal(supplyBlockHashesMinter[3]);
   });
   
   it("registers change#supply blocks followed by a valid mint block", async () => {

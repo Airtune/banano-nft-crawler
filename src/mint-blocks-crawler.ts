@@ -4,9 +4,9 @@ import { NanoNode } from 'nano-account-crawler/dist/nano-node';
 import { bananoIpfs } from "./lib/banano-ipfs";
 import { parseFinishSupplyRepresentative, parseSupplyRepresentative } from "./block-parsers/supply";
 import { validateMintBlock } from "./validate-mint-block";
-import { CANCEL_SUPPLY_REPRESENTATIVE, MAX_RPC_ITERATIONS } from "./constants";
+import { ADDRESS_PATTERN, CANCEL_SUPPLY_REPRESENTATIVE, MAX_RPC_ITERATIONS, META_PROTOCOL_SUPPORTED_VERSIONS } from "./constants";
 import { IMintBlock } from "./interfaces/mint-block";
-import { TAccount } from "./types/banano";
+import { TAccount, TBlockHash } from "./types/banano";
 
 // Crawler to find all mint blocks for a specific supply block
 export class MintBlocksCrawler {
@@ -15,22 +15,45 @@ export class MintBlocksCrawler {
   private _issuer: string;
   private _nftSupplyBlock: INanoBlock;
   private _nftSupplyBlockHash: string;
+  private _nftSupplyBlockHeight: bigint;
   private _maxSupply: bigint;
   private _metadataRepresentative: string;
   private _mintBlocks: INanoBlock[];
+  private _mintBlockCount: bigint;
   private _version: string;
+  private _finishedSupply: boolean;
+  private _cachedData: boolean = false;
 
   constructor(issuer: string, nftSupplyBlockHash: string) {
     this._issuer = issuer;
     this._nftSupplyBlockHash = nftSupplyBlockHash;
+    this._finishedSupply = false;
+    this._mintBlocks = [];
+  }
+
+  initFromCache(nftSupplyBlockHeight: bigint, mintBlockCount: bigint, version: string, maxSupply: bigint, metadataRepresentative: string) {
+    this._nftSupplyBlockHeight = nftSupplyBlockHeight;
+    this._mintBlockCount = mintBlockCount;
+    this._version = version;
+    this._maxSupply = maxSupply;
+    this._hasLimitedSupply = this._maxSupply > BigInt("0");
+    this._finishedSupply = this.supplyExceeded();
+    this._metadataRepresentative = metadataRepresentative;
+  }
+
+  private cachedCrawlData(): boolean {
+    return typeof(this._nftSupplyBlockHeight) == 'bigint' && typeof(this._mintBlockCount) == 'bigint';
   }
 
   async crawl(nanoNode: NanoNode, maxRpcIterations: number = MAX_RPC_ITERATIONS) {
+    if (this._finishedSupply) { return; }
+
     const banCrawler = new NanoAccountForwardCrawler(nanoNode, this._issuer, this._nftSupplyBlockHash);
     await banCrawler.initialize();
     banCrawler.maxRpcIterations = maxRpcIterations;
 
     this._mintBlocks = [];
+    this._mintBlockCount = BigInt("0");
     let blockOffset: number = 0;
 
     // Crawl forward in issuer account from supply block
@@ -41,18 +64,34 @@ export class MintBlocksCrawler {
         }
 
       } else if (this.parseFinishSupplyBlock(block)) {
+        this._finishedSupply = true;
         break;
 
       } else if (blockOffset === 1) {
-        if (block.representative === CANCEL_SUPPLY_REPRESENTATIVE) { break; };
-        validateMintBlock(block as IMintBlock);
-        this.parseFirstMint(block);
-        this._mintBlocks.push(block);
+        if (block.representative === CANCEL_SUPPLY_REPRESENTATIVE) {
+          this._finishedSupply = true;
+          break;
+        } else {
+          try {
+            validateMintBlock(block as IMintBlock);
+            this.parseFirstMint(block);
+            this._mintBlocks.push(block);
+            this._mintBlockCount++;
+          } catch (error) {
+            if (error.message.match(/^MintBlockError\:/)) {
+              this._finishedSupply = true;
+              break;
+            } else {
+              throw error;
+            }
+          }
+        };
 
       } else if (blockOffset > 1 && block.representative === this._metadataRepresentative) {
         try {
           validateMintBlock(block as IMintBlock);
           this._mintBlocks.push(block);
+          this._mintBlockCount++;
         } catch (error) {
           if (!error.message.match(/^MintBlockError\:/)) {
             throw error;
@@ -62,9 +101,44 @@ export class MintBlocksCrawler {
       }
 
       if (this.supplyExceeded()) {
+        this._finishedSupply = true;
         break;
       }
       blockOffset = blockOffset + 1;
+    }
+  }
+
+  async crawlFromFrontier(nanoNode: NanoNode, frontier: TBlockHash, maxRpcIterations: number = MAX_RPC_ITERATIONS) {
+    if (this._finishedSupply) { return; }
+    if (!this.cachedSupplyBlock()) { throw Error(`CacheError: crawlFromFrontier: Supply block not cached`); }
+    if (!this.cachedCrawlData()) { throw Error("CacheError: crawlFromFrontier: No cached crawl data"); }
+    if (typeof(this._metadataRepresentative) !== 'string' && (this._metadataRepresentative as string).match(ADDRESS_PATTERN)) { throw Error("CacheError: crawlFromFrontier: No cached metadata representative"); }
+
+    const banCrawler = new NanoAccountForwardCrawler(nanoNode, this._issuer, frontier, "1");
+    await banCrawler.initialize();
+    banCrawler.maxRpcIterations = maxRpcIterations;
+
+    // Crawl forward in issuer account from supply block
+    for await (const block of banCrawler) {
+      if (this.parseFinishSupplyBlock(block)) {
+        this._finishedSupply = true;
+        break;
+      } else if (block.representative === this._metadataRepresentative) {
+        try {
+          validateMintBlock(block as IMintBlock);
+          this._mintBlocks.push(block);
+          this._mintBlockCount++;
+        } catch (error) {
+          if (!error.message.match(/^MintBlockError\:/)) {
+            throw error;
+          }
+        }
+      }
+
+      if (this.supplyExceeded()) {
+        this._finishedSupply = true;
+        break;
+      }
     }
   }
 
@@ -92,6 +166,14 @@ export class MintBlocksCrawler {
     return this._hasLimitedSupply;
   }
 
+  public get finishedSupply() {
+    return this._finishedSupply;
+  }
+
+  public get mintBlockCount() {
+    return this._mintBlockCount;
+  }
+
   private parseSupplyBlock(block: INanoBlock): boolean {
     const supplyData = parseSupplyRepresentative(block.representative as TAccount);
     if (!supplyData) { return false }
@@ -100,8 +182,13 @@ export class MintBlocksCrawler {
     this._version = version;
     this._maxSupply = maxSupply;
     this._nftSupplyBlock = block;
+    this._nftSupplyBlockHeight = BigInt(block.height);
     this._hasLimitedSupply = this._maxSupply > BigInt("0");
     return true;
+  }
+
+  private cachedSupplyBlock(): boolean {
+    return META_PROTOCOL_SUPPORTED_VERSIONS.includes(this._version) && typeof(this._maxSupply) === 'bigint' && typeof(this._nftSupplyBlockHeight) === 'bigint' && typeof(this._hasLimitedSupply) == 'boolean';
   }
 
   private parseFinishSupplyBlock(block: INanoBlock): boolean {
@@ -111,7 +198,7 @@ export class MintBlocksCrawler {
     }
 
     const { supplyBlockHeight } = finishSupplyData;
-    return supplyBlockHeight === BigInt(this._nftSupplyBlock.height);
+    return supplyBlockHeight === this._nftSupplyBlockHeight;
   }
 
   private parseFirstMint(block: INanoBlock) {
@@ -120,6 +207,6 @@ export class MintBlocksCrawler {
   }
 
   private supplyExceeded(): boolean {
-    return this._hasLimitedSupply && BigInt(this._mintBlocks.length) >= this._maxSupply;
+    return this._hasLimitedSupply && this._mintBlockCount >= this._maxSupply;
   }
 }

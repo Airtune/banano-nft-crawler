@@ -6,16 +6,45 @@ import { getBlock } from '../src/lib/get-block';
 import { TAccount, TBlockHash } from '../src/types/banano';
 import { IAssetBlock } from '../src/interfaces/asset-block';
 import { INanoBlock } from 'nano-account-crawler/dist/nano-interfaces';
+import { twosAssetChain } from './data/twos-asset-chain';
+import { bananoIpfs } from '../src/lib/banano-ipfs';
 
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
+const issuer: TAccount = "ban_1ty5s13h9tg9f57gwsto8njkzejfu9tjasc8a9mn1wujfxib8dj7w54jg3qm";
+const swapIssuer: TAccount = "ban_1swapxh34bjstbc8c5tonbncw5nrc6sgk7h71bxtetty3huiqcj6mja9rxjt";
+let swapMintBlock;
+let swapAssetCrawler;
+
+const testSlice = async (start: number, end: number) => {
+  const recipient: TAccount = "ban_1twos81eoq9s6d1asht5wwz53m9kw7hkuajad1m4u5otgcsb4qstymquhahf";
+    
+  const mintBlockHash = "F61CCF94D6E5CFE9601C436ACC3976AF876D1DA21909FEB88B629BEDEC4DF1EA";
+  const assetRepresentative = bananoIpfs.publicKeyToAccount(mintBlockHash);
+  const mintBlock = await getBlock(bananode, issuer, mintBlockHash).catch((error) => { throw(error) });
+  if (mintBlock === undefined) { throw 'undefined mintBlock'; }
+  const assetCrawler = new AssetCrawler(issuer, mintBlock);
+
+  assetCrawler.initFromCache(assetRepresentative, twosAssetChain.slice(0, 1))
+  await assetCrawler.crawl(bananode).catch((error) => { throw(error) });
+  
+  const assetBlocksHashes1: TBlockHash[] = assetCrawler.assetChain.map((block) => { return block.nanoBlock.hash; });
+  const assetBlocksHashes2: TBlockHash[] = twosAssetChain.map(         (block) => { return block.nanoBlock.hash; });
+  expect(assetBlocksHashes1).to.deep.equal(assetBlocksHashes2);
+
+  const assetStates1: TBlockHash[] = assetCrawler.assetChain.map((block) => { return block.state; });
+  const assetStates2: TBlockHash[] = twosAssetChain.map(         (block) => { return block.state; });
+  expect(assetStates1).to.deep.equal(assetStates2);
+
+  const assetAccounts1: TBlockHash[] = assetCrawler.assetChain.map((block) => { return block.account + block.owner; });
+  const assetAccounts2: TBlockHash[] = twosAssetChain.map(         (block) => { return block.account + block.owner; });
+  expect(assetAccounts1).to.deep.equal(assetAccounts2);
+};
+
 describe('AssetCrawler', function () {
-  this.timeout(10000);
-  const issuer: TAccount = "ban_1ty5s13h9tg9f57gwsto8njkzejfu9tjasc8a9mn1wujfxib8dj7w54jg3qm";
-  const swapIssuer: TAccount = "ban_1swapxh34bjstbc8c5tonbncw5nrc6sgk7h71bxtetty3huiqcj6mja9rxjt";
-  let swapMintBlock;
-  let swapAssetCrawler;
+  // 20 seconds timeout so I can test under poor network conditions :')
+  this.timeout(20000);
 
   // IPFS CID: QmPDFGyV7QKdT4MvV8vhuvPYsDoy66KxqDzB93mpne6tQ5
   // Corresponding Metadata Representative: ban_159p616fwg36pynrh3i4b3p6qg4oxxxemypxgz6ubzid65kbcd4y4kpu5p6b
@@ -23,6 +52,18 @@ describe('AssetCrawler', function () {
     swapMintBlock = await getBlock(bananode, swapIssuer, "439F5CB566E957576C2473B7AF6F3D7D17FBF5022685EB70ED825EAC3B84A56A").catch((error) => { throw(error) });
     swapAssetCrawler = new AssetCrawler(swapIssuer, swapMintBlock);
     await swapAssetCrawler.crawl(bananode).catch((error) => { throw(error) });
+  });
+
+  it("confirms partial trace 1 from head for change#mint > send#asset > receive#asset", async () => {
+    await testSlice(0, 1);
+  });
+
+  it("confirms partial trace 2 from head for change#mint > send#asset > receive#asset", async () => {
+    await testSlice(0, 2);
+  });
+
+  it("confirms partial trace 3 from head for change#mint > send#asset > receive#asset", async () => {
+    await testSlice(0, 3);
   });
 
   it("confirms change#mint > send#asset > receive#asset", async () => {
@@ -39,6 +80,18 @@ describe('AssetCrawler', function () {
     expect("receive#asset").to.equal(assetFrontier.type);
     expect(false).to.equal(assetFrontier.locked);
     expect(assetFrontier.nanoBlock.hash).to.equal('201D206790E46B4CB24CA9F0DB370F8F4BA2E905D66E8DE825D36A9D0E775DAB');
+    // double check assetChain matches cached twosAssetChain
+    const assetBlocksHashes1: TBlockHash[] = assetCrawler.assetChain.map((block) => { return block.nanoBlock.hash; });
+    const assetBlocksHashes2: TBlockHash[] = twosAssetChain.map(         (block) => { return block.nanoBlock.hash; });
+    expect(assetBlocksHashes1).to.deep.equal(assetBlocksHashes2);
+
+    const assetStates1: TBlockHash[] = assetCrawler.assetChain.map((block) => { return block.state; });
+    const assetStates2: TBlockHash[] = twosAssetChain.map(         (block) => { return block.state; });
+    expect(assetStates1).to.deep.equal(assetStates2);
+
+    const assetAccounts1: TBlockHash[] = assetCrawler.assetChain.map((block) => { return block.account + block.owner; });
+    const assetAccounts2: TBlockHash[] = twosAssetChain.map(         (block) => { return block.account + block.owner; });
+    expect(assetAccounts1).to.deep.equal(assetAccounts2);
   });
 
   it("confirms send#mint > receive#asset", async () => {

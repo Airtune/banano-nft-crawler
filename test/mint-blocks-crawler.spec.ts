@@ -55,6 +55,31 @@ describe('MintBlocksCrawler', function() {
     finishedMintBlockHashes3mint9 = finishedMintBlocks3mint9.map((block) => { return block.hash; });
   });
 
+  it("can cache and resume detection of mint blocks", async () => {
+    const issuer: TAccount = "ban_3mint9uhtn84io1817o7qnxnm1outy7oas3b6b5upg91mw3oghzctpeeqa17";
+    const supplyBlockHash = "9332F8036F0B038A22CAF8C77E751523D1F81FEE1E8830CD5DE7B0B02C99D31D";
+    const supplyBlockHeight = BigInt('11');
+    const crawlHead = "9F439AFD9ECF85A72F150355814AB7317FAB932BB54A9E5D7AA09A37BEDA8D89";
+    const mintBlockCount = BigInt('1');
+    const maxSupply = BigInt('2');
+    const metadataRepresentative = "ban_3kdgkooyub7t1wk7yquqrkow7ujg9iz5k7yjigrb5cpzzo4hrqds1gdxkfia";
+    const cachedMintBlocksCrawler = new MintBlocksCrawler(issuer, supplyBlockHash);
+    
+    cachedMintBlocksCrawler.initFromCache(supplyBlockHeight, mintBlockCount, "1.0.0", maxSupply, metadataRepresentative);
+    await cachedMintBlocksCrawler.crawlFromFrontier(bananode, crawlHead);
+    expect(cachedMintBlocksCrawler.mintBlocks.length).to.equal(1);
+    expect(cachedMintBlocksCrawler.mintBlockCount).to.equal(BigInt('2'));
+
+    // Same test but with a different crawlHead
+    const crawlHeadAhead = "861D888E217A6A2EE2DFA4CEBB9496D0B47D1072FB11AA6B1E050DAF9FF56D0B";
+    const cachedMintBlocksCrawlerAhead = new MintBlocksCrawler(issuer, supplyBlockHash);
+    
+    cachedMintBlocksCrawlerAhead.initFromCache(supplyBlockHeight, mintBlockCount, "1.0.0", maxSupply, metadataRepresentative);
+    await cachedMintBlocksCrawlerAhead.crawlFromFrontier(bananode, crawlHeadAhead);
+    expect(cachedMintBlocksCrawlerAhead.mintBlocks.length).to.equal(1);
+    expect(cachedMintBlocksCrawlerAhead.mintBlockCount).to.equal(BigInt('2'));
+  });
+
   it("doesn't detect any mints if the change#supply block is the frontier of an account", async () => {
     const supplyBlockHash: TBlockHash = "4837E7DF43A8B8C8507411E575A5421BFC7D1707F0860129B6A09BF6BF8ABAB5";
     const issuer: TAccount = "ban_11nriprqsrt3tag5h1t81s1588noncoseusmuda79u3pcrbydeobtsxun1r1";

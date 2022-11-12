@@ -47,7 +47,11 @@ export class SupplyBlocksCrawler {
       // Cache followedByBlock that is ahead of block in next iteration
       frontierCheckedBlock = followedByBlock;
       this._head = frontierCheckedBlock.hash;
-      this._offset = "1";
+      if (this.validateSupplyRepresentative(frontierCheckedBlock.representative as TAccount)) {
+        this._offset = "-1";
+      } else {
+        this._offset = "0";
+      }
     }
 
     this.supplyBlocks = supplyBlocks;
@@ -87,8 +91,12 @@ export class SupplyBlocksCrawler {
       return false;
     }
 
+    return this.validateSupplyRepresentative(block.representative as TAccount);
+  }
+
+  private validateSupplyRepresentative(representative: TAccount): boolean {
     // Check if representative is a parsable supply_representative with a supported version
-    const supplyData = parseSupplyRepresentative(block.representative as TAccount);
+    const supplyData = parseSupplyRepresentative(representative as TAccount);
     if (!supplyData) {
       return false;
     }

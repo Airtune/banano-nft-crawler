@@ -69,7 +69,6 @@ var AssetCrawler = /** @class */ (function () {
     AssetCrawler.prototype.crawl = function (nanoNode, maxTraceLength) {
         if (maxTraceLength === void 0) { maxTraceLength = constants_1.MAX_TRACE_LENGTH; }
         return __awaiter(this, void 0, void 0, function () {
-            var newStep;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -81,19 +80,39 @@ var AssetCrawler = /** @class */ (function () {
                     case 1:
                         _a.sent();
                         _a.label = 2;
-                    case 2:
-                        newStep = true;
-                        _a.label = 3;
+                    case 2: return [4 /*yield*/, this.crawlFromFrontier(nanoNode, maxTraceLength)];
                     case 3:
-                        if (!newStep) return [3 /*break*/, 5];
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    AssetCrawler.prototype.initFromCache = function (assetRepresentative, assetChain, initialTraceLength) {
+        if (initialTraceLength === void 0) { initialTraceLength = undefined; }
+        this._assetRepresentative = assetRepresentative;
+        this._assetChain = assetChain;
+        this._traceLength = initialTraceLength || this._traceLength;
+    };
+    AssetCrawler.prototype.crawlFromFrontier = function (nanoNode, maxTraceLength) {
+        if (maxTraceLength === void 0) { maxTraceLength = constants_1.MAX_TRACE_LENGTH; }
+        return __awaiter(this, void 0, void 0, function () {
+            var newStep;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        newStep = true;
+                        _a.label = 1;
+                    case 1:
+                        if (!newStep) return [3 /*break*/, 3];
                         return [4 /*yield*/, this.crawlStep(nanoNode).catch(function (error) { throw (error); })];
-                    case 4:
+                    case 2:
                         newStep = _a.sent();
                         if (this._traceLength >= maxTraceLength) {
-                            return [3 /*break*/, 5];
+                            return [3 /*break*/, 3];
                         }
-                        return [3 /*break*/, 3];
-                    case 5: return [2 /*return*/];
+                        return [3 /*break*/, 1];
+                    case 3: return [2 /*return*/];
                 }
             });
         });
@@ -157,6 +176,26 @@ var AssetCrawler = /** @class */ (function () {
     Object.defineProperty(AssetCrawler.prototype, "assetRepresentative", {
         get: function () {
             return this._assetRepresentative;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(AssetCrawler.prototype, "head", {
+        get: function () {
+            return this._head;
+        },
+        set: function (value) {
+            this._head = value;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(AssetCrawler.prototype, "headHeight", {
+        get: function () {
+            return this._headHeight;
+        },
+        set: function (value) {
+            this._headHeight = value;
         },
         enumerable: false,
         configurable: true

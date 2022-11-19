@@ -90,7 +90,13 @@ var SupplyBlocksCrawler = /** @class */ (function () {
                         // Cache followedByBlock that is ahead of block in next iteration
                         frontierCheckedBlock = followedByBlock;
                         this._head = frontierCheckedBlock.hash;
-                        this._offset = "1";
+                        this._headHeight = parseInt(frontierCheckedBlock.height);
+                        if (this.validateSupplyRepresentative(frontierCheckedBlock.representative)) {
+                            this._offset = "-1";
+                        }
+                        else {
+                            this._offset = "0";
+                        }
                         _b.label = 5;
                     case 5: return [3 /*break*/, 3];
                     case 6: return [3 /*break*/, 13];
@@ -145,8 +151,11 @@ var SupplyBlocksCrawler = /** @class */ (function () {
         if (this.ignoreMetadataRepresentatives.includes(followedByBlock.representative)) {
             return false;
         }
+        return this.validateSupplyRepresentative(block.representative);
+    };
+    SupplyBlocksCrawler.prototype.validateSupplyRepresentative = function (representative) {
         // Check if representative is a parsable supply_representative with a supported version
-        var supplyData = (0, supply_1.parseSupplyRepresentative)(block.representative);
+        var supplyData = (0, supply_1.parseSupplyRepresentative)(representative);
         if (!supplyData) {
             return false;
         }
@@ -155,6 +164,20 @@ var SupplyBlocksCrawler = /** @class */ (function () {
         }
         return true;
     };
+    Object.defineProperty(SupplyBlocksCrawler.prototype, "head", {
+        get: function () {
+            return this._head;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(SupplyBlocksCrawler.prototype, "headHeight", {
+        get: function () {
+            return this._headHeight;
+        },
+        enumerable: false,
+        configurable: true
+    });
     return SupplyBlocksCrawler;
 }());
 exports.SupplyBlocksCrawler = SupplyBlocksCrawler;

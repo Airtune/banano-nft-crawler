@@ -40,9 +40,9 @@ exports.receivableCrawl = void 0;
 var find_receive_block_1 = require("../../lib/find-receive-block");
 function receivableCrawl(nanoNode, assetCrawler) {
     return __awaiter(this, void 0, void 0, function () {
-        var sendBlockHash, sender, recipient, receiveBlock;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
+        var sendBlockHash, sender, recipient, _a, success, block;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
                 case 0:
                     sendBlockHash = assetCrawler.frontier.nanoBlock.hash;
                     if (assetCrawler.frontier.type === "send#mint") {
@@ -54,20 +54,25 @@ function receivableCrawl(nanoNode, assetCrawler) {
                     recipient = assetCrawler.frontier.owner;
                     return [4 /*yield*/, (0, find_receive_block_1.findReceiveBlock)(nanoNode, sender, sendBlockHash, recipient)];
                 case 1:
-                    receiveBlock = _a.sent();
+                    _a = _b.sent(), success = _a.success, block = _a.block;
                     // guards
-                    if (typeof receiveBlock === 'undefined') {
+                    if (typeof block === 'undefined') {
                         return [2 /*return*/, false];
                     }
                     assetCrawler.traceLength += BigInt(1);
-                    if (receiveBlock.subtype === 'receive' && receiveBlock.link === sendBlockHash) {
+                    assetCrawler.head = block.hash;
+                    assetCrawler.headHeight = parseInt(block.height);
+                    if (!success) {
+                        return [2 /*return*/, false];
+                    }
+                    if (block.subtype === 'receive' && block.link === sendBlockHash) {
                         assetCrawler.assetChain.push({
                             state: 'owned',
                             type: 'receive#asset',
                             account: recipient,
                             owner: recipient,
                             locked: false,
-                            nanoBlock: receiveBlock,
+                            nanoBlock: block,
                             traceLength: assetCrawler.traceLength
                         });
                         return [2 /*return*/, true];

@@ -52,9 +52,24 @@ var constants_1 = require("./constants");
 // Crawler to find all mint blocks for a specific supply block
 var MintBlocksCrawler = /** @class */ (function () {
     function MintBlocksCrawler(issuer, nftSupplyBlockHash) {
+        this._cachedData = false;
         this._issuer = issuer;
         this._nftSupplyBlockHash = nftSupplyBlockHash;
+        this._finishedSupply = false;
+        this._mintBlocks = [];
     }
+    MintBlocksCrawler.prototype.initFromCache = function (nftSupplyBlockHeight, mintBlockCount, version, maxSupply, metadataRepresentative) {
+        this._nftSupplyBlockHeight = nftSupplyBlockHeight;
+        this._mintBlockCount = mintBlockCount;
+        this._version = version;
+        this._maxSupply = maxSupply;
+        this._hasLimitedSupply = this._maxSupply > BigInt("0");
+        this._finishedSupply = this.supplyExceeded();
+        this._metadataRepresentative = metadataRepresentative;
+    };
+    MintBlocksCrawler.prototype.cachedCrawlData = function () {
+        return typeof (this._nftSupplyBlockHeight) == 'bigint' && typeof (this._mintBlockCount) == 'bigint';
+    };
     MintBlocksCrawler.prototype.crawl = function (nanoNode, maxRpcIterations) {
         var e_1, _a;
         if (maxRpcIterations === void 0) { maxRpcIterations = constants_1.MAX_RPC_ITERATIONS; }
@@ -63,12 +78,16 @@ var MintBlocksCrawler = /** @class */ (function () {
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
+                        if (this._finishedSupply) {
+                            return [2 /*return*/];
+                        }
                         banCrawler = new nano_account_forward_crawler_1.NanoAccountForwardCrawler(nanoNode, this._issuer, this._nftSupplyBlockHash);
                         return [4 /*yield*/, banCrawler.initialize()];
                     case 1:
                         _b.sent();
                         banCrawler.maxRpcIterations = maxRpcIterations;
                         this._mintBlocks = [];
+                        this._mintBlockCount = BigInt("0");
                         blockOffset = 0;
                         _b.label = 2;
                     case 2:
@@ -85,21 +104,37 @@ var MintBlocksCrawler = /** @class */ (function () {
                             }
                         }
                         else if (this.parseFinishSupplyBlock(block)) {
+                            this._finishedSupply = true;
                             return [3 /*break*/, 6];
                         }
                         else if (blockOffset === 1) {
                             if (block.representative === constants_1.CANCEL_SUPPLY_REPRESENTATIVE) {
+                                this._finishedSupply = true;
                                 return [3 /*break*/, 6];
                             }
+                            else {
+                                try {
+                                    (0, validate_mint_block_1.validateMintBlock)(block);
+                                    this.parseFirstMint(block);
+                                    this._mintBlocks.push(block);
+                                    this._mintBlockCount++;
+                                }
+                                catch (error) {
+                                    if (error.message.match(/^MintBlockError\:/)) {
+                                        this._finishedSupply = true;
+                                        return [3 /*break*/, 6];
+                                    }
+                                    else {
+                                        throw error;
+                                    }
+                                }
+                            }
                             ;
-                            (0, validate_mint_block_1.validateMintBlock)(block);
-                            this.parseFirstMint(block);
-                            this._mintBlocks.push(block);
                         }
                         else if (blockOffset > 1 && block.representative === this._metadataRepresentative) {
                             try {
                                 (0, validate_mint_block_1.validateMintBlock)(block);
-                                this._mintBlocks.push(block);
+                                this.addMintBlock(block);
                             }
                             catch (error) {
                                 if (!error.message.match(/^MintBlockError\:/)) {
@@ -108,6 +143,7 @@ var MintBlocksCrawler = /** @class */ (function () {
                             }
                         }
                         if (this.supplyExceeded()) {
+                            this._finishedSupply = true;
                             return [3 /*break*/, 6];
                         }
                         blockOffset = blockOffset + 1;
@@ -134,6 +170,89 @@ var MintBlocksCrawler = /** @class */ (function () {
                 }
             });
         });
+    };
+    MintBlocksCrawler.prototype.crawlFromFrontier = function (nanoNode, frontier, maxRpcIterations) {
+        var e_2, _a;
+        if (maxRpcIterations === void 0) { maxRpcIterations = constants_1.MAX_RPC_ITERATIONS; }
+        return __awaiter(this, void 0, void 0, function () {
+            var banCrawler, banCrawler_2, banCrawler_2_1, block, e_2_1;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        if (this._finishedSupply) {
+                            return [2 /*return*/];
+                        }
+                        if (!this.cachedSupplyBlock()) {
+                            throw Error("CacheError: crawlFromFrontier: Supply block not cached");
+                        }
+                        if (!this.cachedCrawlData()) {
+                            throw Error("CacheError: crawlFromFrontier: No cached crawl data");
+                        }
+                        if (typeof (this._metadataRepresentative) !== 'string' && this._metadataRepresentative.match(constants_1.ADDRESS_PATTERN)) {
+                            throw Error("CacheError: crawlFromFrontier: No cached metadata representative");
+                        }
+                        banCrawler = new nano_account_forward_crawler_1.NanoAccountForwardCrawler(nanoNode, this._issuer, frontier, "1");
+                        return [4 /*yield*/, banCrawler.initialize()];
+                    case 1:
+                        _b.sent();
+                        banCrawler.maxRpcIterations = maxRpcIterations;
+                        _b.label = 2;
+                    case 2:
+                        _b.trys.push([2, 7, 8, 13]);
+                        banCrawler_2 = __asyncValues(banCrawler);
+                        _b.label = 3;
+                    case 3: return [4 /*yield*/, banCrawler_2.next()];
+                    case 4:
+                        if (!(banCrawler_2_1 = _b.sent(), !banCrawler_2_1.done)) return [3 /*break*/, 6];
+                        block = banCrawler_2_1.value;
+                        if (this.parseFinishSupplyBlock(block)) {
+                            this._finishedSupply = true;
+                            return [3 /*break*/, 6];
+                        }
+                        else if (block.representative === this._metadataRepresentative) {
+                            try {
+                                (0, validate_mint_block_1.validateMintBlock)(block);
+                                this.addMintBlock(block);
+                            }
+                            catch (error) {
+                                if (!error.message.match(/^MintBlockError\:/)) {
+                                    throw error;
+                                }
+                            }
+                        }
+                        if (this.supplyExceeded()) {
+                            this._finishedSupply = true;
+                            return [3 /*break*/, 6];
+                        }
+                        _b.label = 5;
+                    case 5: return [3 /*break*/, 3];
+                    case 6: return [3 /*break*/, 13];
+                    case 7:
+                        e_2_1 = _b.sent();
+                        e_2 = { error: e_2_1 };
+                        return [3 /*break*/, 13];
+                    case 8:
+                        _b.trys.push([8, , 11, 12]);
+                        if (!(banCrawler_2_1 && !banCrawler_2_1.done && (_a = banCrawler_2.return))) return [3 /*break*/, 10];
+                        return [4 /*yield*/, _a.call(banCrawler_2)];
+                    case 9:
+                        _b.sent();
+                        _b.label = 10;
+                    case 10: return [3 /*break*/, 12];
+                    case 11:
+                        if (e_2) throw e_2.error;
+                        return [7 /*endfinally*/];
+                    case 12: return [7 /*endfinally*/];
+                    case 13: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    MintBlocksCrawler.prototype.addMintBlock = function (block) {
+        this._mintBlocks.push(block);
+        this._mintBlockCount++;
+        this._head = block.hash;
+        this._headHeight = parseInt(block.height);
     };
     Object.defineProperty(MintBlocksCrawler.prototype, "nftSupplyBlock", {
         get: function () {
@@ -177,6 +296,34 @@ var MintBlocksCrawler = /** @class */ (function () {
         enumerable: false,
         configurable: true
     });
+    Object.defineProperty(MintBlocksCrawler.prototype, "finishedSupply", {
+        get: function () {
+            return this._finishedSupply;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(MintBlocksCrawler.prototype, "mintBlockCount", {
+        get: function () {
+            return this._mintBlockCount;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(MintBlocksCrawler.prototype, "head", {
+        get: function () {
+            return this._head;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(MintBlocksCrawler.prototype, "headHeight", {
+        get: function () {
+            return this._headHeight;
+        },
+        enumerable: false,
+        configurable: true
+    });
     MintBlocksCrawler.prototype.parseSupplyBlock = function (block) {
         var supplyData = (0, supply_1.parseSupplyRepresentative)(block.representative);
         if (!supplyData) {
@@ -186,8 +333,12 @@ var MintBlocksCrawler = /** @class */ (function () {
         this._version = version;
         this._maxSupply = maxSupply;
         this._nftSupplyBlock = block;
+        this._nftSupplyBlockHeight = BigInt(block.height);
         this._hasLimitedSupply = this._maxSupply > BigInt("0");
         return true;
+    };
+    MintBlocksCrawler.prototype.cachedSupplyBlock = function () {
+        return constants_1.META_PROTOCOL_SUPPORTED_VERSIONS.includes(this._version) && typeof (this._maxSupply) === 'bigint' && typeof (this._nftSupplyBlockHeight) === 'bigint' && typeof (this._hasLimitedSupply) == 'boolean';
     };
     MintBlocksCrawler.prototype.parseFinishSupplyBlock = function (block) {
         var finishSupplyData = (0, supply_1.parseFinishSupplyRepresentative)(block.representative);
@@ -195,14 +346,14 @@ var MintBlocksCrawler = /** @class */ (function () {
             return false;
         }
         var supplyBlockHeight = finishSupplyData.supplyBlockHeight;
-        return supplyBlockHeight === BigInt(this._nftSupplyBlock.height);
+        return supplyBlockHeight === this._nftSupplyBlockHeight;
     };
     MintBlocksCrawler.prototype.parseFirstMint = function (block) {
         this._metadataRepresentative = block.representative;
         this._ipfsCID = banano_ipfs_1.bananoIpfs.accountToIpfsCidV0(this._metadataRepresentative);
     };
     MintBlocksCrawler.prototype.supplyExceeded = function () {
-        return this._hasLimitedSupply && BigInt(this._mintBlocks.length) >= this._maxSupply;
+        return this._hasLimitedSupply && this._mintBlockCount >= this._maxSupply;
     };
     return MintBlocksCrawler;
 }());

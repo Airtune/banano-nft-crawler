@@ -1,6 +1,6 @@
 {
   "name": "banano-nft-crawler",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "description": "Library for crawling across the Banano ledger to trace NFTs.",
   "files": [
     "dist/**/*.*",

@@ -73,6 +73,8 @@ function ownedCrawl(nanoNode, assetCrawler) {
                     if (!(frontierCrawler_1_1 = _b.sent(), !frontierCrawler_1_1.done)) return [3 /*break*/, 7];
                     nanoBlock = frontierCrawler_1_1.value;
                     assetCrawler.traceLength += BigInt(1);
+                    assetCrawler.head = nanoBlock.hash;
+                    assetCrawler.headHeight = parseInt(nanoBlock.height);
                     assetBlock = toAssetBlock(assetCrawler, nanoBlock);
                     if (assetBlock === undefined) {
                         return [3 /*break*/, 6];

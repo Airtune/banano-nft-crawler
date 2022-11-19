@@ -81,6 +81,8 @@ function atomicSwapPayableCrawl(nanoNode, assetCrawler) {
                             nanoBlock: nextBlock,
                             traceLength: assetCrawler.traceLength
                         });
+                        assetCrawler.head = nextBlock.hash;
+                        assetCrawler.headHeight = parseInt(nextBlock.height);
                     }
                     else {
                         type = void 0;
@@ -111,6 +113,8 @@ function atomicSwapPayableCrawl(nanoNode, assetCrawler) {
                             nanoBlock: sendAtomicSwap.nanoBlock,
                             traceLength: assetCrawler.traceLength
                         });
+                        assetCrawler.head = sendAtomicSwap.nanoBlock.hash;
+                        assetCrawler.headHeight = parseInt(sendAtomicSwap.nanoBlock.height);
                     }
                     return [2 /*return*/, true];
             }

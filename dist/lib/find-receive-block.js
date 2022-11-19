@@ -48,15 +48,16 @@ var nano_account_backward_crawler_1 = require("nano-account-crawler/dist/nano-ac
 function findReceiveBlock(nanoNode, senderAccount, sendHash, receiverAccount) {
     var e_1, _a;
     return __awaiter(this, void 0, void 0, function () {
-        var nanoBackwardIterable, nanoBackwardIterable_1, nanoBackwardIterable_1_1, block, e_1_1, error_1;
+        var nanoBackwardIterable, headBlock, nanoBackwardIterable_1, nanoBackwardIterable_1_1, block, e_1_1, error_1;
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
                     _b.trys.push([0, 14, , 15]);
-                    nanoBackwardIterable = new nano_account_backward_crawler_1.NanoAccountBackwardCrawler(nanoNode, receiverAccount, undefined, [senderAccount]);
+                    nanoBackwardIterable = new nano_account_backward_crawler_1.NanoAccountBackwardCrawler(nanoNode, receiverAccount, undefined);
                     return [4 /*yield*/, nanoBackwardIterable.initialize()];
                 case 1:
                     _b.sent();
+                    headBlock = void 0;
                     _b.label = 2;
                 case 2:
                     _b.trys.push([2, 7, 8, 13]);
@@ -66,8 +67,9 @@ function findReceiveBlock(nanoNode, senderAccount, sendHash, receiverAccount) {
                 case 4:
                     if (!(nanoBackwardIterable_1_1 = _b.sent(), !nanoBackwardIterable_1_1.done)) return [3 /*break*/, 6];
                     block = nanoBackwardIterable_1_1.value;
+                    headBlock = headBlock || block;
                     if (block.type === 'state' && block.subtype === 'receive' && block.link === sendHash) {
-                        return [2 /*return*/, block];
+                        return [2 /*return*/, { success: true, block: block }];
                     }
                     _b.label = 5;
                 case 5: return [3 /*break*/, 3];
@@ -88,7 +90,7 @@ function findReceiveBlock(nanoNode, senderAccount, sendHash, receiverAccount) {
                     if (e_1) throw e_1.error;
                     return [7 /*endfinally*/];
                 case 12: return [7 /*endfinally*/];
-                case 13: return [2 /*return*/, undefined];
+                case 13: return [2 /*return*/, { success: false, block: headBlock }];
                 case 14:
                     error_1 = _b.sent();
                     throw (error_1);

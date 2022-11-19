@@ -52,6 +52,8 @@ function assetMintCrawl(_nanoNode, assetCrawler, _mintBlock) {
                     nanoBlock: _mintBlock,
                     traceLength: assetCrawler.traceLength
                 });
+                assetCrawler.head = _mintBlock.hash;
+                assetCrawler.headHeight = parseInt(_mintBlock.height);
                 return [2 /*return*/, true];
             }
             else if (_mintBlock.subtype == 'change' && _mintBlock.type === 'state') {
@@ -64,6 +66,8 @@ function assetMintCrawl(_nanoNode, assetCrawler, _mintBlock) {
                     nanoBlock: _mintBlock,
                     traceLength: assetCrawler.traceLength
                 });
+                assetCrawler.head = _mintBlock.hash;
+                assetCrawler.headHeight = parseInt(_mintBlock.height);
                 return [2 /*return*/, true];
             }
             else {

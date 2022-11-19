@@ -54,6 +54,8 @@ function returnToNFTSellerCrawl(_nanoNode, assetCrawler) {
                 traceLength: assetCrawler.traceLength
             };
             assetCrawler.assetChain.push(frontier);
+            assetCrawler.head = sendAtomicSwapBlock.nanoBlock.hash;
+            assetCrawler.headHeight = parseInt(sendAtomicSwapBlock.nanoBlock.height);
             return [2 /*return*/, true];
         });
     });

@@ -1,10 +1,13 @@
 import { INanoBlock } from "nano-account-crawler/dist/nano-interfaces";
 import { IAssetBlock } from "./interfaces/asset-block";
 import { IAtomicSwapConditions } from "./interfaces/atomic-swap-conditions";
+import { TBlockHash } from "./types/banano";
 import { NanoNode } from 'nano-account-crawler/dist/nano-node';
 export declare class AssetCrawler {
     private _assetChain;
     private _assetRepresentative;
+    private _head;
+    private _headHeight;
     private _metadataRepresentative;
     private _issuer;
     private _mintBlock;
@@ -16,6 +19,8 @@ export declare class AssetCrawler {
     lockedInAccount: string;
     constructor(issuer: string, mintBlock: INanoBlock);
     crawl(nanoNode: NanoNode, maxTraceLength?: bigint): Promise<void>;
+    initFromCache(assetRepresentative: string, assetChain: IAssetBlock[], initialTraceLength?: bigint): void;
+    crawlFromFrontier(nanoNode: NanoNode, maxTraceLength?: bigint): Promise<void>;
     private crawlStep;
     currentAtomicSwapConditions(): IAtomicSwapConditions | undefined;
     findSendAtomicSwapBlock(): IAssetBlock | undefined;
@@ -23,6 +28,10 @@ export declare class AssetCrawler {
     get frontier(): IAssetBlock;
     get previousFrontier(): IAssetBlock;
     get assetRepresentative(): string;
+    get head(): (undefined | TBlockHash);
+    set head(value: TBlockHash);
+    get headHeight(): (undefined | number);
+    set headHeight(value: number);
     get issuer(): string;
     get metadataRepresentative(): string;
     get traceLength(): bigint;

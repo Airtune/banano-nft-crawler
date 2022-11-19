@@ -95,6 +95,8 @@ function atomicSwapReceivableCrawl(nanoNode, assetCrawler) {
                             nanoBlock: receiveBlock,
                             traceLength: assetCrawler.traceLength
                         });
+                        assetCrawler.head = receiveBlock.hash;
+                        assetCrawler.headHeight = parseInt(receiveBlock.height);
                     }
                     else {
                         // Atomic swap conditions were not met. Start chain from send#atomic_swap with new state.
@@ -116,6 +118,8 @@ function atomicSwapReceivableCrawl(nanoNode, assetCrawler) {
                             nanoBlock: sendAtomicSwap.nanoBlock,
                             traceLength: assetCrawler.traceLength
                         });
+                        assetCrawler.head = sendAtomicSwap.nanoBlock.hash;
+                        assetCrawler.headHeight = parseInt(sendAtomicSwap.nanoBlock.height);
                     }
                     return [2 /*return*/, true];
             }

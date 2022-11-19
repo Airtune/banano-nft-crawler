@@ -11,6 +11,8 @@ import { TAccount, TBlockHash } from "./types/banano";
 // Crawler to find all mint blocks for a specific supply block
 export class MintBlocksCrawler {
   private _hasLimitedSupply: boolean;
+  private _head: TBlockHash;
+  private _headHeight: number;
   private _ipfsCID: string;
   private _issuer: string;
   private _nftSupplyBlock: INanoBlock;
@@ -90,14 +92,12 @@ export class MintBlocksCrawler {
       } else if (blockOffset > 1 && block.representative === this._metadataRepresentative) {
         try {
           validateMintBlock(block as IMintBlock);
-          this._mintBlocks.push(block);
-          this._mintBlockCount++;
+          this.addMintBlock(block);
         } catch (error) {
           if (!error.message.match(/^MintBlockError\:/)) {
             throw error;
           }
         }
-
       }
 
       if (this.supplyExceeded()) {
@@ -126,8 +126,8 @@ export class MintBlocksCrawler {
       } else if (block.representative === this._metadataRepresentative) {
         try {
           validateMintBlock(block as IMintBlock);
-          this._mintBlocks.push(block);
-          this._mintBlockCount++;
+          this.addMintBlock(block);
+          
         } catch (error) {
           if (!error.message.match(/^MintBlockError\:/)) {
             throw error;
@@ -140,6 +140,13 @@ export class MintBlocksCrawler {
         break;
       }
     }
+  }
+
+  addMintBlock(block: INanoBlock) {
+    this._mintBlocks.push(block);
+    this._mintBlockCount++;
+    this._head = block.hash;
+    this._headHeight = parseInt(block.height);
   }
 
   public get nftSupplyBlock() {
@@ -172,6 +179,14 @@ export class MintBlocksCrawler {
 
   public get mintBlockCount() {
     return this._mintBlockCount;
+  }
+
+  public get head(): (undefined | TBlockHash) {
+    return this._head;
+  }
+
+  public get headHeight(): (undefined | number) {
+    return this._headHeight;
   }
 
   private parseSupplyBlock(block: INanoBlock): boolean {

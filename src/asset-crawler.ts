@@ -4,7 +4,7 @@ import { IAssetBlock } from "./interfaces/asset-block";
 import { IAtomicSwapConditions } from "./interfaces/atomic-swap-conditions";
 
 // types
-import { TAccount } from "./types/banano";
+import { TAccount, TBlockHash } from "./types/banano";
 
 // packages
 import { NanoNode } from 'nano-account-crawler/dist/nano-node';
@@ -38,6 +38,8 @@ const assetCrawlerStates = {
 export class AssetCrawler {
   private _assetChain: IAssetBlock[];
   private _assetRepresentative: string;
+  private _head: TBlockHash;
+  private _headHeight: number;
   private _metadataRepresentative: string;
   private _issuer: string;
   private _mintBlock: INanoBlock;
@@ -132,6 +134,22 @@ export class AssetCrawler {
 
   public get assetRepresentative() {
     return this._assetRepresentative;
+  }
+
+  public get head(): (undefined | TBlockHash) {
+    return this._head;
+  }
+
+  public set head(value: TBlockHash) {
+    this._head = value;
+  }
+
+  public get headHeight(): (undefined | number) {
+    return this._headHeight;
+  }
+
+  public set headHeight(value: number) {
+    this._headHeight = value;
   }
 
   public get issuer() {

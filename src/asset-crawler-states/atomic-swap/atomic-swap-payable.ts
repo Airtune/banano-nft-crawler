@@ -51,6 +51,8 @@ export async function atomicSwapPayableCrawl(nanoNode: NanoNode, assetCrawler: A
       nanoBlock: nextBlock,
       traceLength: assetCrawler.traceLength
     });
+    assetCrawler.head = nextBlock.hash;
+    assetCrawler.headHeight = parseInt(nextBlock.height);
   } else {
     // Atomic swap conditions were not met.
     // Continue chain from send#atomic_swap again with state 'owned' instead of state 'pending_atomic_swap'.
@@ -83,6 +85,8 @@ export async function atomicSwapPayableCrawl(nanoNode: NanoNode, assetCrawler: A
       nanoBlock: sendAtomicSwap.nanoBlock,
       traceLength: assetCrawler.traceLength
     });
+    assetCrawler.head = sendAtomicSwap.nanoBlock.hash;
+    assetCrawler.headHeight = parseInt(sendAtomicSwap.nanoBlock.height);
   }
 
   return true;

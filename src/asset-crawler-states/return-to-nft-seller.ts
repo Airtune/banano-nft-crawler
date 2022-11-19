@@ -21,6 +21,9 @@ export async function returnToNFTSellerCrawl(_nanoNode: NanoNode, assetCrawler: 
   };
 
   assetCrawler.assetChain.push(frontier);
+
+  assetCrawler.head = sendAtomicSwapBlock.nanoBlock.hash;
+  assetCrawler.headHeight = parseInt(sendAtomicSwapBlock.nanoBlock.height);
   
   return true;
 }

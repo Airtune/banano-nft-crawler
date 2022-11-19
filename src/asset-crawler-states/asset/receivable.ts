@@ -14,22 +14,25 @@ export async function receivableCrawl(nanoNode: NanoNode, assetCrawler: AssetCra
   }
 
   const recipient = assetCrawler.frontier.owner;
-  const receiveBlock = await findReceiveBlock(nanoNode, sender, sendBlockHash, recipient);
+  const { success, block } = await findReceiveBlock(nanoNode, sender, sendBlockHash, recipient);
   // guards
-  if (typeof receiveBlock === 'undefined') { return false; }
-
+  if (typeof block === 'undefined') { return false; }
   assetCrawler.traceLength += BigInt(1);
+  assetCrawler.head = block.hash;
+  assetCrawler.headHeight = parseInt(block.height);
+  if (!success) { return false; }
 
-  if (receiveBlock.subtype === 'receive' && receiveBlock.link === sendBlockHash) {
+  if (block.subtype === 'receive' && block.link === sendBlockHash) {
     assetCrawler.assetChain.push({
       state: 'owned',
       type: 'receive#asset',
       account: recipient,
       owner: recipient,
       locked: false,
-      nanoBlock: receiveBlock,
+      nanoBlock: block,
       traceLength: assetCrawler.traceLength
     });
+
     return true;
   }
 

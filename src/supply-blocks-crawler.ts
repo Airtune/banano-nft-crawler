@@ -12,8 +12,9 @@ import { TAccount, TBlockHash } from "./types/banano";
 
 // Crawler to find all supply blocks by an issuer
 export class SupplyBlocksCrawler {
-  private _issuer: string;
   private _head: TBlockHash;
+  private _headHeight: number;
+  private _issuer: string;
   private _offset: string;
   public ignoreMetadataRepresentatives: TAccount[];
   public supplyBlocks: INanoBlock[];
@@ -47,6 +48,7 @@ export class SupplyBlocksCrawler {
       // Cache followedByBlock that is ahead of block in next iteration
       frontierCheckedBlock = followedByBlock;
       this._head = frontierCheckedBlock.hash;
+      this._headHeight = parseInt(frontierCheckedBlock.height);
       if (this.validateSupplyRepresentative(frontierCheckedBlock.representative as TAccount)) {
         this._offset = "-1";
       } else {
@@ -105,5 +107,13 @@ export class SupplyBlocksCrawler {
     }
 
     return true;
+  }
+
+  public get head(): (undefined | TBlockHash) {
+    return this._head;
+  }
+
+  public get headHeight(): (undefined | number) {
+    return this._headHeight;
   }
 }

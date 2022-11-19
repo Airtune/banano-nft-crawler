@@ -14,6 +14,8 @@ export async function assetMintCrawl(_nanoNode: NanoNode, assetCrawler: AssetCra
       nanoBlock: _mintBlock,
       traceLength: assetCrawler.traceLength
     });
+    assetCrawler.head = _mintBlock.hash;
+    assetCrawler.headHeight = parseInt(_mintBlock.height);
     return true;
 
   } else if (_mintBlock.subtype == 'change' && _mintBlock.type === 'state') {
@@ -26,6 +28,8 @@ export async function assetMintCrawl(_nanoNode: NanoNode, assetCrawler: AssetCra
       nanoBlock: _mintBlock,
       traceLength: assetCrawler.traceLength
     });
+    assetCrawler.head = _mintBlock.hash;
+    assetCrawler.headHeight = parseInt(_mintBlock.height);
     return true;
 
   } else {

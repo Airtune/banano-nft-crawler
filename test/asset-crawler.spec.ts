@@ -40,6 +40,9 @@ const testSlice = async (start: number, end: number) => {
   const assetAccounts1: TBlockHash[] = assetCrawler.assetChain.map((block) => { return block.account + block.owner; });
   const assetAccounts2: TBlockHash[] = twosAssetChain.map(         (block) => { return block.account + block.owner; });
   expect(assetAccounts1).to.deep.equal(assetAccounts2);
+
+  expect(assetCrawler.head).to.equal("62DCF26825FA44C394D1C468BCB6B69E779C9E17899DB04B4489C33FB58057EF")
+  expect(assetCrawler.headHeight).to.equal(16);
 };
 
 describe('AssetCrawler', function () {
@@ -107,6 +110,9 @@ describe('AssetCrawler', function () {
     expect("owned").to.equal(assetFrontier.state);
     expect("receive#asset").to.equal(assetFrontier.type);
     expect(false).to.equal(assetFrontier.locked);
+
+    expect(assetCrawler.head).to.equal("62DCF26825FA44C394D1C468BCB6B69E779C9E17899DB04B4489C33FB58057EF")
+    expect(assetCrawler.headHeight).to.equal(16);
   });
 
   it("send all NFTs command sends all NFTs", async () => {
@@ -167,6 +173,9 @@ describe('AssetCrawler', function () {
     expect(payingAccount).to.equal(nft4Frontier.account);
     expect("atomic_swap_payable").to.equal(nft4Frontier.state);
     expect("receive#atomic_swap").to.equal(nft4Frontier.type);
+
+    expect(nft4AssetCrawler.head).to.equal("024ACA494596E054C94E86A11C881018F6A0D73B108D1A0D15A66F91ADCEC1D8")
+    expect(nft4AssetCrawler.headHeight).to.equal(15);
   });
 
   it("unreceived change#mint, send#asset is owned by recipient but not sendable", async () => {
@@ -182,6 +191,8 @@ describe('AssetCrawler', function () {
     expect("receivable").to.equal(assetFrontier.state);
     expect("send#asset").to.equal(assetFrontier.type);
     expect(false).to.equal(assetFrontier.locked);
+    expect(assetCrawler.head).to.equal("62DCF26825FA44C394D1C468BCB6B69E779C9E17899DB04B4489C33FB58057EF")
+    expect(assetCrawler.headHeight).to.equal(16);
   });
 
   it("unreceived send#mint is owned by recipient but not sendable", async () => {
@@ -265,6 +276,9 @@ describe('AssetCrawler', function () {
     expect("ban_1oozinhbrw7nrjfmtq1roybi8t7q7jywwne4pjto7oy78injdmn4n3a5w5br").to.equal(assetCrawler.assetChain[3].owner);
 
     expect("ban_1oozinhbrw7nrjfmtq1roybi8t7q7jywwne4pjto7oy78injdmn4n3a5w5br").to.equal(assetCrawler.frontier.owner);
+
+    expect(assetCrawler.head).to.equal("3ABC8F384C0A6B07D1F537ECD553C79DD3611900937D90D0A50B095BC3446B89")
+    expect(assetCrawler.headHeight).to.equal(3);
   });
 
   it("ignores send#asset before receive#asset and after previously confirmed send#asset", async () => {
@@ -307,6 +321,8 @@ describe('AssetCrawler', function () {
 
     expect(assetCrawler.frontier.nanoBlock.hash).to.equal("E8285EBCF17C5FD0DFDCE086253A72D4795032FB5E23F8D13880954D8BB8AE56");
     expect(assetCrawler.frontier.owner).to.equal("ban_1buyayd6csb1rwprgcks9sif66hthrbu9jah5ehspmsxghi63ter8f66cy1p");
+    expect(assetCrawler.head).to.equal("E8285EBCF17C5FD0DFDCE086253A72D4795032FB5E23F8D13880954D8BB8AE56")
+    expect(assetCrawler.headHeight).to.equal(3);
   });
 
   it("ignores invalid send#atomic_swap where encoded receive height is less than 2", async () => {
@@ -336,6 +352,10 @@ describe('AssetCrawler', function () {
     expect("owned").to.equal(cantAssetCrawler6.frontier.state);
     expect("change#mint").to.equal(cantAssetCrawler6.frontier.type); // ignore send#atomic_swap with 3 raw
     expect(false).to.equal(cantAssetCrawler6.frontier.locked);
+
+    
+    expect(cantAssetCrawler6.head).to.equal("024ACA494596E054C94E86A11C881018F6A0D73B108D1A0D15A66F91ADCEC1D8")
+    expect(cantAssetCrawler6.headHeight).to.equal(15);
   });
 
   it("cancels atomic swap if paying account balance is less than min raw in block at: receive height - 1", async () => {

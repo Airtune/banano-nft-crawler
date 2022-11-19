@@ -29,6 +29,8 @@ export async function ownedCrawl(nanoNode: NanoNode, assetCrawler: AssetCrawler)
 
     for await (const nanoBlock of frontierCrawler) {
       assetCrawler.traceLength += BigInt(1);
+      assetCrawler.head = nanoBlock.hash;
+      assetCrawler.headHeight = parseInt(nanoBlock.height);
 
       const assetBlock: IAssetBlock = toAssetBlock(assetCrawler, nanoBlock);
       if (assetBlock === undefined) { continue; }

@@ -22,6 +22,14 @@ Crawls through several accounts if required to trace a single NFT from the mint 
 * Support asset caching and continuing from the cache instead of tracing all the way from the mint block every time.
 * Add usage examples
 
+# Naming conventions
+
+From the Nano RPC, the account field is the recipient for send blocks.
+
+For the banano-nft-crawler lib, in an IAssetBlock, the `account` field is used mark which account to mark which account to continue crawling in.
+
+`owner` and `account` has different values in a `send#atomic_swap` block. The seller is the `owner` of the NFT until the buyer `account` sends the payment.
+
 # See also
 
 These crawlers are extracted from:

@@ -9,11 +9,10 @@ export async function returnToNFTSellerCrawl(_nanoNode: NanoNode, assetCrawler: 
   const assetChain: IAssetBlock[] = assetCrawler.assetChain;
 
   const sendAtomicSwapBlock = _findSenderBlock(assetChain);
-  const account = sendAtomicSwapBlock.nanoBlock.account;
   let frontier: IAssetBlock = {
     state: "owned",
     type: "send#returned_to_sender",
-    account: account,
+    account: sendAtomicSwapBlock.account,
     owner: sendAtomicSwapBlock.account,
     locked: false,
     nanoBlock: sendAtomicSwapBlock.nanoBlock,

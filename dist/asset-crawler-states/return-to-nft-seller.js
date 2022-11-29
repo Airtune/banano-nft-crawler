@@ -39,15 +39,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.returnToNFTSellerCrawl = void 0;
 function returnToNFTSellerCrawl(_nanoNode, assetCrawler) {
     return __awaiter(this, void 0, void 0, function () {
-        var assetChain, sendAtomicSwapBlock, account, frontier;
+        var assetChain, sendAtomicSwapBlock, frontier;
         return __generator(this, function (_a) {
             assetChain = assetCrawler.assetChain;
             sendAtomicSwapBlock = _findSenderBlock(assetChain);
-            account = sendAtomicSwapBlock.nanoBlock.account;
             frontier = {
                 state: "owned",
                 type: "send#returned_to_sender",
-                account: account,
+                account: sendAtomicSwapBlock.account,
                 owner: sendAtomicSwapBlock.account,
                 locked: false,
                 nanoBlock: sendAtomicSwapBlock.nanoBlock,

@@ -1,6 +1,5 @@
-import { INanoBlock } from "nano-account-crawler/dist/nano-interfaces";
+import { INanoBlock, TAccount, TBlockHash } from "nano-account-crawler/dist/nano-interfaces";
 import { NanoNode } from 'nano-account-crawler/dist/nano-node';
-import { TBlockHash } from "./types/banano";
 export declare class MintBlocksCrawler {
     private _hasLimitedSupply;
     private _head;
@@ -17,8 +16,8 @@ export declare class MintBlocksCrawler {
     private _version;
     private _finishedSupply;
     private _cachedData;
-    constructor(issuer: string, nftSupplyBlockHash: string);
-    initFromCache(nftSupplyBlockHeight: bigint, mintBlockCount: bigint, version: string, maxSupply: bigint, metadataRepresentative: string): void;
+    constructor(issuer: TAccount, nftSupplyBlockHash: string);
+    initFromCache(nftSupplyBlockHeight: bigint, mintBlockCount: bigint, version: string, maxSupply: bigint, metadataRepresentative: TAccount): void;
     private cachedCrawlData;
     crawl(nanoNode: NanoNode, maxRpcIterations?: number): Promise<void>;
     crawlFromFrontier(nanoNode: NanoNode, frontier: TBlockHash, maxRpcIterations?: number): Promise<void>;

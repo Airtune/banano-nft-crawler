@@ -30,6 +30,10 @@ For the banano-nft-crawler lib, in an IAssetBlock, the `account` field is used m
 
 `owner` and `account` has different values in a `send#atomic_swap` block. The seller is the `owner` of the NFT until the buyer `account` sends the payment.
 
+`head` or `crawlHead` usually refers to the latest block checked while crawling even if it isn't an IAssetBlock.
+
+`frontier` in the context of the crawlers refer to the latest IAssetBlock that can be behind the head.
+
 # See also
 
 These crawlers are extracted from:

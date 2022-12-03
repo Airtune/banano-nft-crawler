@@ -1,6 +1,6 @@
 {
   "name": "banano-nft-crawler",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "Library for crawling across the Banano ledger to trace NFTs.",
   "files": [
     "dist/**/*.*",
@@ -18,7 +18,7 @@
   "dependencies": {
     "@bananocoin/bananojs": "^2.6.2",
     "chai-as-promised": "^7.1.1",
-    "nano-account-crawler": "^1.0.19",
+    "nano-account-crawler": "^1.0.22",
     "nano-ipfs": "^1.0.4",
     "node-fetch": "^2.6.1"
   },

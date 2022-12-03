@@ -15,14 +15,21 @@ export async function returnToNFTSellerCrawl(_nanoNode: NanoNode, assetCrawler: 
     account: sendAtomicSwapBlock.account,
     owner: sendAtomicSwapBlock.account,
     locked: false,
-    nanoBlock: sendAtomicSwapBlock.nanoBlock,
-    traceLength: assetCrawler.traceLength
+    traceLength: assetCrawler.traceLength,
+    block_link:           sendAtomicSwapBlock.block_link,
+    block_hash:           sendAtomicSwapBlock.block_hash,
+    block_height:         sendAtomicSwapBlock.block_height,
+    block_account:        sendAtomicSwapBlock.block_account,
+    block_representative: sendAtomicSwapBlock.block_representative,
+    block_type:           sendAtomicSwapBlock.block_type,
+    block_subtype:        sendAtomicSwapBlock.block_subtype,
+    block_amount:         sendAtomicSwapBlock.block_amount
   };
 
   assetCrawler.assetChain.push(frontier);
 
-  assetCrawler.head = sendAtomicSwapBlock.nanoBlock.hash;
-  assetCrawler.headHeight = parseInt(sendAtomicSwapBlock.nanoBlock.height);
+  assetCrawler.head = sendAtomicSwapBlock.block_hash;
+  assetCrawler.headHeight = parseInt(sendAtomicSwapBlock.block_height);
   
   return true;
 }
@@ -35,5 +42,5 @@ function _findSenderBlock(assetChain: IAssetBlock[]): IAssetBlock {
     }
   }
 
-  throw Error(`Unabled to find atomic_swap_receivable for asset: ${assetChain[0].nanoBlock.hash}`);;
+  throw Error(`Unabled to find atomic_swap_receivable for asset: ${assetChain[0].block_hash}`);;
 }

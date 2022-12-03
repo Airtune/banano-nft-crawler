@@ -44,7 +44,7 @@ function receivableCrawl(nanoNode, assetCrawler) {
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
-                    sendBlockHash = assetCrawler.frontier.nanoBlock.hash;
+                    sendBlockHash = assetCrawler.frontier.block_hash;
                     if (assetCrawler.frontier.type === "send#mint") {
                         sender = assetCrawler.issuer;
                     }
@@ -72,8 +72,15 @@ function receivableCrawl(nanoNode, assetCrawler) {
                             account: recipient,
                             owner: recipient,
                             locked: false,
-                            nanoBlock: block,
-                            traceLength: assetCrawler.traceLength
+                            traceLength: assetCrawler.traceLength,
+                            block_link: block.link,
+                            block_hash: block.hash,
+                            block_height: block.height,
+                            block_account: block.account,
+                            block_representative: block.representative,
+                            block_type: block.type,
+                            block_subtype: block.subtype,
+                            block_amount: block.amount
                         });
                         return [2 /*return*/, true];
                     }

@@ -1,4 +1,4 @@
-import { INanoBlock } from "nano-account-crawler/dist/nano-interfaces";
+import { INanoBlock, TAccount, TBlockHash } from "nano-account-crawler/dist/nano-interfaces";
 import { NanoAccountForwardCrawler } from 'nano-account-crawler/dist/nano-account-forward-crawler';
 import { NanoNode } from 'nano-account-crawler/dist/nano-node';
 import { bananoIpfs } from "./lib/banano-ipfs";
@@ -6,7 +6,6 @@ import { parseFinishSupplyRepresentative, parseSupplyRepresentative } from "./bl
 import { validateMintBlock } from "./validate-mint-block";
 import { ADDRESS_PATTERN, CANCEL_SUPPLY_REPRESENTATIVE, MAX_RPC_ITERATIONS, META_PROTOCOL_SUPPORTED_VERSIONS } from "./constants";
 import { IMintBlock } from "./interfaces/mint-block";
-import { TAccount, TBlockHash } from "./types/banano";
 
 // Crawler to find all mint blocks for a specific supply block
 export class MintBlocksCrawler {
@@ -14,7 +13,7 @@ export class MintBlocksCrawler {
   private _head: TBlockHash;
   private _headHeight: number;
   private _ipfsCID: string;
-  private _issuer: string;
+  private _issuer: TAccount;
   private _nftSupplyBlock: INanoBlock;
   private _nftSupplyBlockHash: string;
   private _nftSupplyBlockHeight: bigint;
@@ -26,14 +25,14 @@ export class MintBlocksCrawler {
   private _finishedSupply: boolean;
   private _cachedData: boolean = false;
 
-  constructor(issuer: string, nftSupplyBlockHash: string) {
+  constructor(issuer: TAccount, nftSupplyBlockHash: string) {
     this._issuer = issuer;
     this._nftSupplyBlockHash = nftSupplyBlockHash;
     this._finishedSupply = false;
     this._mintBlocks = [];
   }
 
-  initFromCache(nftSupplyBlockHeight: bigint, mintBlockCount: bigint, version: string, maxSupply: bigint, metadataRepresentative: string) {
+  initFromCache(nftSupplyBlockHeight: bigint, mintBlockCount: bigint, version: string, maxSupply: bigint, metadataRepresentative: TAccount) {
     this._nftSupplyBlockHeight = nftSupplyBlockHeight;
     this._mintBlockCount = mintBlockCount;
     this._version = version;
@@ -190,7 +189,7 @@ export class MintBlocksCrawler {
   }
 
   private parseSupplyBlock(block: INanoBlock): boolean {
-    const supplyData = parseSupplyRepresentative(block.representative as TAccount);
+    const supplyData = parseSupplyRepresentative(block.representative);
     if (!supplyData) { return false }
 
     const { version, maxSupply } = supplyData;
@@ -207,7 +206,7 @@ export class MintBlocksCrawler {
   }
 
   private parseFinishSupplyBlock(block: INanoBlock): boolean {
-    const finishSupplyData = parseFinishSupplyRepresentative(block.representative as TAccount);
+    const finishSupplyData = parseFinishSupplyRepresentative(block.representative);
     if (!finishSupplyData) {
       return false;
     }

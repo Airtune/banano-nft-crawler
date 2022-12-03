@@ -1,11 +1,10 @@
-import { INanoBlock } from "nano-account-crawler/dist/nano-interfaces";
+import { INanoBlock, TAccount } from "nano-account-crawler/dist/nano-interfaces";
 import { IAtomicSwapConditions } from "../../interfaces/atomic-swap-conditions";
 import { TAssetBlockType } from "../../types/asset-block-type";
 
 import { AssetCrawler } from "../../asset-crawler";
 import { parseAtomicSwapRepresentative } from "../../block-parsers/atomic-swap";
 import { findBlockAtHeightAndPreviousBlock } from "../../lib/find-block-at-height-and-previous-block";
-import { TAccount } from "../../types/banano";
 import { IAssetBlock } from "../../interfaces/asset-block";
 import { NanoNode } from "nano-account-crawler/dist/nano-node";
 
@@ -24,7 +23,7 @@ function validPayment(previousBlock: INanoBlock, nextBlock: INanoBlock, sendAtom
 // State for when receive#atomic_swap is confirmed but send#payment hasn't been sent yet.
 export async function atomicSwapPayableCrawl(nanoNode: NanoNode, assetCrawler: AssetCrawler): Promise<boolean> {
   const payingAccount = assetCrawler.frontier.account;
-  const paymentHeight = BigInt(assetCrawler.frontier.nanoBlock.height) + BigInt(1);
+  const paymentHeight = BigInt(assetCrawler.frontier.block_height) + BigInt(1);
   const [previousBlock, nextBlock]: [INanoBlock, INanoBlock] = await findBlockAtHeightAndPreviousBlock(nanoNode, payingAccount, paymentHeight);
   const sendAtomicSwap: IAssetBlock = assetCrawler.findSendAtomicSwapBlock();
   // guards
@@ -48,8 +47,15 @@ export async function atomicSwapPayableCrawl(nanoNode: NanoNode, assetCrawler: A
       account: payingAccount,
       owner: payingAccount,
       locked: false,
-      nanoBlock: nextBlock,
-      traceLength: assetCrawler.traceLength
+      traceLength: assetCrawler.traceLength,
+      block_link: nextBlock.link,
+      block_hash: nextBlock.hash,
+      block_height: nextBlock.height,
+      block_account: nextBlock.account,
+      block_representative: nextBlock.representative,
+      block_type: nextBlock.type,
+      block_subtype: nextBlock.subtype,
+      block_amount: nextBlock.amount
     });
     assetCrawler.head = nextBlock.hash;
     assetCrawler.headHeight = parseInt(nextBlock.height);
@@ -73,8 +79,15 @@ export async function atomicSwapPayableCrawl(nanoNode: NanoNode, assetCrawler: A
       account: originalOwner,
       owner: originalOwner,
       locked: false,
-      nanoBlock: nextBlock,
-      traceLength: assetCrawler.traceLength
+      traceLength: assetCrawler.traceLength,
+      block_link: nextBlock.link,
+      block_hash: nextBlock.hash,
+      block_height: nextBlock.height,
+      block_account: nextBlock.account,
+      block_representative: nextBlock.representative,
+      block_type: nextBlock.type,
+      block_subtype: nextBlock.subtype,
+      block_amount: nextBlock.amount
     });
     assetCrawler.assetChain.push({
       state: "owned",
@@ -82,11 +95,18 @@ export async function atomicSwapPayableCrawl(nanoNode: NanoNode, assetCrawler: A
       account: originalOwner,
       owner: originalOwner,
       locked: false,
-      nanoBlock: sendAtomicSwap.nanoBlock,
-      traceLength: assetCrawler.traceLength
+      traceLength: assetCrawler.traceLength,
+      block_link: sendAtomicSwap.block_link,
+      block_hash: sendAtomicSwap.block_hash,
+      block_height: sendAtomicSwap.block_height,
+      block_account: sendAtomicSwap.block_account,
+      block_representative: sendAtomicSwap.block_representative,
+      block_type: sendAtomicSwap.block_type,
+      block_subtype: sendAtomicSwap.block_subtype,
+      block_amount: sendAtomicSwap.block_amount
     });
-    assetCrawler.head = sendAtomicSwap.nanoBlock.hash;
-    assetCrawler.headHeight = parseInt(sendAtomicSwap.nanoBlock.height);
+    assetCrawler.head = sendAtomicSwap.block_hash;
+    assetCrawler.headHeight = parseInt(sendAtomicSwap.block_height);
   }
 
   return true;

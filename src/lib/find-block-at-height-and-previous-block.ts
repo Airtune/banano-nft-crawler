@@ -1,8 +1,8 @@
 import { NanoAccountBackwardCrawler } from "nano-account-crawler/dist/nano-account-backward-crawler";
-import { INanoBlock } from "nano-account-crawler/dist/nano-interfaces";
+import { INanoBlock, TAccount } from "nano-account-crawler/dist/nano-interfaces";
 import { NanoNode } from "nano-account-crawler/dist/nano-node";
 
-export async function findBlockAtHeightAndPreviousBlock(nanoNode: NanoNode, account: string, height: bigint): Promise<([INanoBlock, INanoBlock]|undefined)> {
+export async function findBlockAtHeightAndPreviousBlock(nanoNode: NanoNode, account: TAccount, height: bigint): Promise<([INanoBlock, INanoBlock]|undefined)> {
   try {
     const nanoBackwardIterable = new NanoAccountBackwardCrawler(nanoNode, account);
     await nanoBackwardIterable.initialize();

@@ -2,8 +2,7 @@ import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import { bananode } from '../bananode';
 import { MintBlocksCrawler } from "../src/mint-blocks-crawler";
-import { TAccount, TBlockHash } from '../src/types/banano';
-import { INanoBlock } from 'nano-account-crawler/dist/nano-interfaces';
+import { INanoBlock, TAccount, TBlockHash } from 'nano-account-crawler/dist/nano-interfaces';
 
 chai.use(chaiAsPromised);
 const expect = chai.expect;

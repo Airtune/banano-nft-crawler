@@ -1,5 +1,5 @@
 import { AssetCrawler } from "../../asset-crawler";
-import { INanoBlock } from "nano-account-crawler/dist/nano-interfaces";
+import { INanoBlock, TAccount } from "nano-account-crawler/dist/nano-interfaces";
 import { NanoNode } from "nano-account-crawler/dist/nano-node";
 
 export async function assetMintCrawl(_nanoNode: NanoNode, assetCrawler: AssetCrawler, _mintBlock: INanoBlock): Promise<boolean> {
@@ -11,8 +11,15 @@ export async function assetMintCrawl(_nanoNode: NanoNode, assetCrawler: AssetCra
       account: recipientAccount,
       owner: recipientAccount,
       locked: false,
-      nanoBlock: _mintBlock,
-      traceLength: assetCrawler.traceLength
+      traceLength: assetCrawler.traceLength,
+      block_link: _mintBlock.link,
+      block_hash: _mintBlock.hash,
+      block_height: _mintBlock.height,
+      block_account: _mintBlock.account,
+      block_representative: _mintBlock.representative,
+      block_type: _mintBlock.type,
+      block_subtype: _mintBlock.subtype,
+      block_amount: _mintBlock.amount
     });
     assetCrawler.head = _mintBlock.hash;
     assetCrawler.headHeight = parseInt(_mintBlock.height);
@@ -25,8 +32,15 @@ export async function assetMintCrawl(_nanoNode: NanoNode, assetCrawler: AssetCra
       account: assetCrawler.issuer,
       owner: assetCrawler.issuer,
       locked: false,
-      nanoBlock: _mintBlock,
-      traceLength: assetCrawler.traceLength
+      traceLength: assetCrawler.traceLength,
+      block_link: _mintBlock.link,
+      block_hash: _mintBlock.hash,
+      block_height: _mintBlock.height,
+      block_account: _mintBlock.account,
+      block_representative: _mintBlock.representative,
+      block_type: _mintBlock.type,
+      block_subtype: _mintBlock.subtype,
+      block_amount: _mintBlock.amount
     });
     assetCrawler.head = _mintBlock.hash;
     assetCrawler.headHeight = parseInt(_mintBlock.height);

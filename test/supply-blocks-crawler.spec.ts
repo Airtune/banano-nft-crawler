@@ -1,9 +1,8 @@
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
-import { INanoBlock } from 'nano-account-crawler/dist/nano-interfaces';
+import { INanoBlock, TBlockHash } from 'nano-account-crawler/dist/nano-interfaces';
 import { bananode } from '../bananode';
 import { SupplyBlocksCrawler } from '../src/supply-blocks-crawler';
-import { TBlockHash } from '../src/types/banano';
 
 chai.use(chaiAsPromised);
 const expect = chai.expect;

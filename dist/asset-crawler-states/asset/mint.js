@@ -49,8 +49,15 @@ function assetMintCrawl(_nanoNode, assetCrawler, _mintBlock) {
                     account: recipientAccount,
                     owner: recipientAccount,
                     locked: false,
-                    nanoBlock: _mintBlock,
-                    traceLength: assetCrawler.traceLength
+                    traceLength: assetCrawler.traceLength,
+                    block_link: _mintBlock.link,
+                    block_hash: _mintBlock.hash,
+                    block_height: _mintBlock.height,
+                    block_account: _mintBlock.account,
+                    block_representative: _mintBlock.representative,
+                    block_type: _mintBlock.type,
+                    block_subtype: _mintBlock.subtype,
+                    block_amount: _mintBlock.amount
                 });
                 assetCrawler.head = _mintBlock.hash;
                 assetCrawler.headHeight = parseInt(_mintBlock.height);
@@ -63,8 +70,15 @@ function assetMintCrawl(_nanoNode, assetCrawler, _mintBlock) {
                     account: assetCrawler.issuer,
                     owner: assetCrawler.issuer,
                     locked: false,
-                    nanoBlock: _mintBlock,
-                    traceLength: assetCrawler.traceLength
+                    traceLength: assetCrawler.traceLength,
+                    block_link: _mintBlock.link,
+                    block_hash: _mintBlock.hash,
+                    block_height: _mintBlock.height,
+                    block_account: _mintBlock.account,
+                    block_representative: _mintBlock.representative,
+                    block_type: _mintBlock.type,
+                    block_subtype: _mintBlock.subtype,
+                    block_amount: _mintBlock.amount
                 });
                 assetCrawler.head = _mintBlock.hash;
                 assetCrawler.headHeight = parseInt(_mintBlock.height);

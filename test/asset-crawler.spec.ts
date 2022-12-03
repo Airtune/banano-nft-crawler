@@ -3,9 +3,8 @@ import * as chaiAsPromised from 'chai-as-promised';
 import { AssetCrawler } from '../src/asset-crawler';
 import { bananode } from '../bananode';
 import { getBlock } from '../src/lib/get-block';
-import { TAccount, TBlockHash } from '../src/types/banano';
 import { IAssetBlock } from '../src/interfaces/asset-block';
-import { INanoBlock } from 'nano-account-crawler/dist/nano-interfaces';
+import { INanoBlock, TAccount, TBlockHash } from 'nano-account-crawler/dist/nano-interfaces';
 import { twosAssetChain } from './data/twos-asset-chain';
 import { bananoIpfs } from '../src/lib/banano-ipfs';
 
@@ -29,8 +28,8 @@ const testSlice = async (start: number, end: number) => {
   assetCrawler.initFromCache(assetRepresentative, twosAssetChain.slice(0, 1))
   await assetCrawler.crawl(bananode).catch((error) => { throw(error) });
   
-  const assetBlocksHashes1: TBlockHash[] = assetCrawler.assetChain.map((block) => { return block.nanoBlock.hash; });
-  const assetBlocksHashes2: TBlockHash[] = twosAssetChain.map(         (block) => { return block.nanoBlock.hash; });
+  const assetBlocksHashes1: TBlockHash[] = assetCrawler.assetChain.map((block) => { return block.block_hash; });
+  const assetBlocksHashes2: TBlockHash[] = twosAssetChain.map(         (block) => { return block.block_hash; });
   expect(assetBlocksHashes1).to.deep.equal(assetBlocksHashes2);
 
   const assetStates1: TBlockHash[] = assetCrawler.assetChain.map((block) => { return block.state; });
@@ -82,10 +81,10 @@ describe('AssetCrawler', function () {
     expect("owned").to.equal(assetFrontier.state);
     expect("receive#asset").to.equal(assetFrontier.type);
     expect(false).to.equal(assetFrontier.locked);
-    expect(assetFrontier.nanoBlock.hash).to.equal('201D206790E46B4CB24CA9F0DB370F8F4BA2E905D66E8DE825D36A9D0E775DAB');
+    expect(assetFrontier.block_hash).to.equal('201D206790E46B4CB24CA9F0DB370F8F4BA2E905D66E8DE825D36A9D0E775DAB');
     // double check assetChain matches cached twosAssetChain
-    const assetBlocksHashes1: TBlockHash[] = assetCrawler.assetChain.map((block) => { return block.nanoBlock.hash; });
-    const assetBlocksHashes2: TBlockHash[] = twosAssetChain.map(         (block) => { return block.nanoBlock.hash; });
+    const assetBlocksHashes1: TBlockHash[] = assetCrawler.assetChain.map((block) => { return block.block_hash; });
+    const assetBlocksHashes2: TBlockHash[] = twosAssetChain.map(         (block) => { return block.block_hash; });
     expect(assetBlocksHashes1).to.deep.equal(assetBlocksHashes2);
 
     const assetStates1: TBlockHash[] = assetCrawler.assetChain.map((block) => { return block.state; });
@@ -126,7 +125,7 @@ describe('AssetCrawler', function () {
     await nft1AssetCrawler.crawl(bananode).catch((error) => { throw(error) });
     const nft1Frontier: IAssetBlock = nft1AssetCrawler.frontier;
     expect(nft1Frontier.owner).to.equal(recipient);
-    expect(nft1Frontier.nanoBlock.hash).to.equal("024ACA494596E054C94E86A11C881018F6A0D73B108D1A0D15A66F91ADCEC1D8"); // !!! Manually validate
+    expect(nft1Frontier.block_hash).to.equal("024ACA494596E054C94E86A11C881018F6A0D73B108D1A0D15A66F91ADCEC1D8"); // !!! Manually validate
 
     // sent with send all assets command, received, sent back to sendAllIssuer, and then received by sendAllIssuer again.
     const mintBlock2 = await getBlock(bananode, sendAllIssuer, "56A2251E0C20CE9B81269E1916858FB2FE178543FA2ED05522D66FC74EC6DD8D");
@@ -135,7 +134,7 @@ describe('AssetCrawler', function () {
     await nft2AssetCrawler.crawl(bananode);
     const nft2Frontier: IAssetBlock = nft2AssetCrawler.frontier;
     expect(nft2Frontier.owner).to.equal(sendAllIssuer);
-    expect(nft2Frontier.nanoBlock.hash).to.equal("D29F111B51E113F58A1805379CB880564402B6DC430B59DE4598E5A5ED36AF3A"); // !!! Manually validate
+    expect(nft2Frontier.block_hash).to.equal("D29F111B51E113F58A1805379CB880564402B6DC430B59DE4598E5A5ED36AF3A"); // !!! Manually validate
 
     // sent with send all assets command, received
     const mintBlock3 = await getBlock(bananode, sendAllIssuer, "A8748C3ABC82C1FC18CD2E9A2AB1AA13E5FCC88F71B1BEBF0C44BE7A520AD393");
@@ -144,7 +143,7 @@ describe('AssetCrawler', function () {
     await nft3AssetCrawler.crawl(bananode);
     const nft3Frontier: IAssetBlock = nft3AssetCrawler.frontier;
     expect(nft3Frontier.owner).to.equal(recipient);
-    expect(nft3Frontier.nanoBlock.hash).to.equal("024ACA494596E054C94E86A11C881018F6A0D73B108D1A0D15A66F91ADCEC1D8"); // !!! Manually validate
+    expect(nft3Frontier.block_hash).to.equal("024ACA494596E054C94E86A11C881018F6A0D73B108D1A0D15A66F91ADCEC1D8"); // !!! Manually validate
 
     // NFT5 minted after the send all assets command
     const mintBlock5 = await getBlock(bananode, sendAllIssuer, "95C9F6EE6038C3DBD7450EC3435203FF3C623EEA8673B7E41077D3DBE875325C");
@@ -153,7 +152,7 @@ describe('AssetCrawler', function () {
     await nft5AssetCrawler.crawl(bananode);
     const nft5Frontier: IAssetBlock = nft5AssetCrawler.frontier;
     expect(sendAllIssuer).to.equal(nft5Frontier.owner);
-    expect(nft5Frontier.nanoBlock.hash).to.equal("95C9F6EE6038C3DBD7450EC3435203FF3C623EEA8673B7E41077D3DBE875325C"); // !!! Manually validate // !!! Manually validate
+    expect(nft5Frontier.block_hash).to.equal("95C9F6EE6038C3DBD7450EC3435203FF3C623EEA8673B7E41077D3DBE875325C"); // !!! Manually validate // !!! Manually validate
   });
 
   // Note that this test relies on an NFT from the test above succeeding.
@@ -208,7 +207,7 @@ describe('AssetCrawler', function () {
     expect(assetFrontier.state).to.equal("receivable");
     expect(assetFrontier.type).to.equal("send#mint");
     expect(assetFrontier.locked).to.equal(false);
-    expect(assetFrontier.nanoBlock.hash).to.equal('D051A922C775616CADC97EB29FD6D75AA514D05ABA4A1252F8B626C9C4F863E8');
+    expect(assetFrontier.block_hash).to.equal('D051A922C775616CADC97EB29FD6D75AA514D05ABA4A1252F8B626C9C4F863E8');
   });
 
   it("is unable to send assets owned by someone else", async () => {
@@ -221,7 +220,7 @@ describe('AssetCrawler', function () {
     await assetCrawler.crawl(bananode);
 
     expect(assetCrawler.frontier.owner).to.equal(issuer);
-    expect(assetCrawler.frontier.nanoBlock.hash).to.equal('777B8264AFDF004C77285CBBA7F208D2BB5A64118FBB5DCCA7D2619374CB3C4A');
+    expect(assetCrawler.frontier.block_hash).to.equal('777B8264AFDF004C77285CBBA7F208D2BB5A64118FBB5DCCA7D2619374CB3C4A');
 
     const assetChain: IAssetBlock[] = assetCrawler.assetChain;
     for (let i = 0; i < assetChain.length; i++) {
@@ -230,8 +229,8 @@ describe('AssetCrawler', function () {
       expect(unrelatedAccount2).to.not.equal(assetBlock.account);
       expect(unrelatedAccount1).to.not.equal(assetBlock.owner);
       expect(unrelatedAccount2).to.not.equal(assetBlock.owner);
-      expect("3F39BE1635C5ECB85741BDE22C879484DE67832F8E140678D3B3C25D42C081FB").to.not.equal(assetBlock.nanoBlock.hash);
-      expect("CAE3296E2AC94C18DFEFAA29D4EAD828108ACC3F1C2B0789868E064F596A71A3").to.not.equal(assetBlock.nanoBlock.hash);
+      expect("3F39BE1635C5ECB85741BDE22C879484DE67832F8E140678D3B3C25D42C081FB").to.not.equal(assetBlock.block_hash);
+      expect("CAE3296E2AC94C18DFEFAA29D4EAD828108ACC3F1C2B0789868E064F596A71A3").to.not.equal(assetBlock.block_hash);
     }
   });
 
@@ -302,13 +301,13 @@ describe('AssetCrawler', function () {
         // send#asset after previously confirmed send#asset
         "62DCF26825FA44C394D1C468BCB6B69E779C9E17899DB04B4489C33FB58057EF"
       ]
-      expect(invalidSendHashes).to.not.include(assetBlock.nanoBlock.hash);
+      expect(invalidSendHashes).to.not.include(assetBlock.block_hash);
     }
 
     // previously confirmed send#asset 
     expect("send#asset").to.equal(assetChain[2].type);
     expect("ban_3testz6spgm48ax8kcwah6swo59sroqfn94fqsgq368z7ki44ccg8hhrx3x8").to.equal(assetChain[2].owner);
-    expect("31C4279ACE505BFACE38BBE4883B1D928C7742BE0C042FF92C8D69C6C8D4B1E1").to.equal(assetChain[2].nanoBlock.hash);
+    expect("31C4279ACE505BFACE38BBE4883B1D928C7742BE0C042FF92C8D69C6C8D4B1E1").to.equal(assetChain[2].block_hash);
   });
 
   it("confirms completed valid atomic swap", async () => {
@@ -319,7 +318,7 @@ describe('AssetCrawler', function () {
     const assetCrawler = new AssetCrawler(swapIssuer, mintBlock);
     await assetCrawler.crawl(bananode);
 
-    expect(assetCrawler.frontier.nanoBlock.hash).to.equal("E8285EBCF17C5FD0DFDCE086253A72D4795032FB5E23F8D13880954D8BB8AE56");
+    expect(assetCrawler.frontier.block_hash).to.equal("E8285EBCF17C5FD0DFDCE086253A72D4795032FB5E23F8D13880954D8BB8AE56");
     expect(assetCrawler.frontier.owner).to.equal("ban_1buyayd6csb1rwprgcks9sif66hthrbu9jah5ehspmsxghi63ter8f66cy1p");
     expect(assetCrawler.head).to.equal("E8285EBCF17C5FD0DFDCE086253A72D4795032FB5E23F8D13880954D8BB8AE56")
     expect(assetCrawler.headHeight).to.equal(3);
@@ -359,7 +358,7 @@ describe('AssetCrawler', function () {
   });
 
   it("cancels atomic swap if paying account balance is less than min raw in block at: receive height - 1", async () => {
-    expect("F8BD752EDB490FC4B505ED878981240A79DB5C0490F7242388EF5E183E17EF29").to.equal(swapAssetCrawler.frontier.nanoBlock.hash);
+    expect("F8BD752EDB490FC4B505ED878981240A79DB5C0490F7242388EF5E183E17EF29").to.equal(swapAssetCrawler.frontier.block_hash);
     expect("ban_1swapxh34bjstbc8c5tonbncw5nrc6sgk7h71bxtetty3huiqcj6mja9rxjt").to.equal(swapAssetCrawler.frontier.owner);
     expect("owned").to.equal(swapAssetCrawler.frontier.state);
     expect("send#returned_to_sender").to.equal(swapAssetCrawler.frontier.type);
@@ -375,7 +374,7 @@ describe('AssetCrawler', function () {
 
     // The receive block that changes representative and is expected to be invalid is:
     // CCBBB68F1C216C45F76C175BB2116F97080512C84D0A4830E0186DADFEF56921
-    expect(failSwapAssetCrawler.frontier.nanoBlock.hash).to.equal("2EEFFD2621E2260255F200131B3CAF3D25271076DB5E8AE856DCE8BBB2DC1875");
+    expect(failSwapAssetCrawler.frontier.block_hash).to.equal("2EEFFD2621E2260255F200131B3CAF3D25271076DB5E8AE856DCE8BBB2DC1875");
     expect(failSwapAssetCrawler.frontier.owner).to.equal("ban_1swapxh34bjstbc8c5tonbncw5nrc6sgk7h71bxtetty3huiqcj6mja9rxjt");
     expect(failSwapAssetCrawler.frontier.state).to.equal("owned");
     expect(failSwapAssetCrawler.frontier.type).to.equal("send#returned_to_sender");
@@ -392,7 +391,7 @@ describe('AssetCrawler', function () {
     expect("owned").to.equal(cantAssetCrawler1.frontier.state);
     expect("send#returned_to_sender").to.equal(cantAssetCrawler1.frontier.type);
     expect(cantAssetCrawler1.frontier.locked).to.equal(false);
-    expect(cantAssetCrawler1.frontier.nanoBlock.hash).to.equal("B6B01C3701CFE5C091FB6DC068075D7A567926C74C44B1BC6F0FAE3BD18A0F6B");
+    expect(cantAssetCrawler1.frontier.block_hash).to.equal("B6B01C3701CFE5C091FB6DC068075D7A567926C74C44B1BC6F0FAE3BD18A0F6B");
   });
 
   it("cancels atomic swap if a block other than send#payment follows receive#atomic_swap", async () => {
@@ -406,7 +405,7 @@ describe('AssetCrawler', function () {
     expect("owned").to.equal(cantAssetCrawler2.frontier.state);
     expect("send#returned_to_sender").to.equal(cantAssetCrawler2.frontier.type);
     expect(cantAssetCrawler2.frontier.locked).to.equal(false);
-    expect(cantAssetCrawler2.frontier.nanoBlock.hash).to.equal("292A27AC9930DFAA00356AF1B78960A2FF785ABDD8999C2FB3D0F20C99A822A0");
+    expect(cantAssetCrawler2.frontier.block_hash).to.equal("292A27AC9930DFAA00356AF1B78960A2FF785ABDD8999C2FB3D0F20C99A822A0");
   });
 
   it("cancels atomic swap if send#payment sends too little raw to the right account", async () => {
@@ -420,7 +419,7 @@ describe('AssetCrawler', function () {
     expect("owned").to.equal(cantAssetCrawler3.frontier.state);
     expect("send#returned_to_sender").to.equal(cantAssetCrawler3.frontier.type);
     expect(cantAssetCrawler3.frontier.locked).to.equal(false);
-    expect(cantAssetCrawler3.frontier.nanoBlock.hash).to.equal("1ACDBFDF725D5738CD6B6454464FA1313574C056626ECEFCA8C4B5D564F75338");
+    expect(cantAssetCrawler3.frontier.block_hash).to.equal("1ACDBFDF725D5738CD6B6454464FA1313574C056626ECEFCA8C4B5D564F75338");
   });
 
   it("cancels atomic swap if send#payment sends enough raw to the wrong account", async () => {
@@ -434,6 +433,6 @@ describe('AssetCrawler', function () {
     expect("owned").to.equal(cantAssetCrawler4.frontier.state);
     expect("send#returned_to_sender").to.equal(cantAssetCrawler4.frontier.type);
     expect(cantAssetCrawler4.frontier.locked).to.equal(false);
-    expect(cantAssetCrawler4.frontier.nanoBlock.hash).to.equal("A5FE789EF4C2E52EEFB31F3356581317FF5D1C8F9DEACDC4AE85EE8AB5D3E56A");
+    expect(cantAssetCrawler4.frontier.block_hash).to.equal("A5FE789EF4C2E52EEFB31F3356581317FF5D1C8F9DEACDC4AE85EE8AB5D3E56A");
   });
 });

@@ -1,6 +1,5 @@
-import { INanoBlock } from "nano-account-crawler/dist/nano-interfaces";
+import { INanoBlock, TAccount, TBlockHash, TStringBigInt } from "nano-account-crawler/dist/nano-interfaces";
 import { NanoNode } from 'nano-account-crawler/dist/nano-node';
-import { TAccount, TBlockHash } from "./types/banano";
 export declare class SupplyBlocksCrawler {
     private _head;
     private _headHeight;
@@ -10,7 +9,7 @@ export declare class SupplyBlocksCrawler {
     supplyBlocks: INanoBlock[];
     metadataRepresentatives: TAccount[];
     frontierCheckedBlock: INanoBlock;
-    constructor(issuer: string, head?: TBlockHash, offset?: string);
+    constructor(issuer: TAccount, head?: TBlockHash, offset?: TStringBigInt);
     crawl(nanoNode: NanoNode, maxRpcIterations?: number): Promise<INanoBlock[]>;
     private validateSupplyBlock;
     private validateSupplyRepresentative;

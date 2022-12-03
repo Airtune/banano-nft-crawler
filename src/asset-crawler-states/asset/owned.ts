@@ -1,5 +1,5 @@
 // dependencies
-import { INanoBlock } from "nano-account-crawler/dist/nano-interfaces";
+import { INanoBlock, TAccount } from "nano-account-crawler/dist/nano-interfaces";
 import { NanoAccountForwardCrawler } from "nano-account-crawler/dist/nano-account-forward-crawler";
 import { NanoNode } from "nano-account-crawler/dist/nano-node";
 
@@ -17,12 +17,11 @@ import { BURN_ACCOUNTS, SEND_ALL_NFTS_REPRESENTATIVE } from "../../constants";
 // src
 import { AssetCrawler } from "../../asset-crawler";
 import { parseAtomicSwapRepresentative } from "../../block-parsers/atomic-swap";
-import { TAccount } from "../../types/banano";
 
 // State for when the the block's account own the asset.
 export async function ownedCrawl(nanoNode: NanoNode, assetCrawler: AssetCrawler): Promise<boolean> {
   // trace forward in account history from frontier block
-  let frontierCrawler = new NanoAccountForwardCrawler(nanoNode, assetCrawler.frontier.owner, assetCrawler.frontier.nanoBlock.hash, "1");
+  let frontierCrawler = new NanoAccountForwardCrawler(nanoNode, assetCrawler.frontier.owner, assetCrawler.frontier.block_hash, "1");
 
   try {
     await frontierCrawler.initialize();
@@ -67,16 +66,23 @@ function toAssetBlock(assetCrawler: AssetCrawler, block: INanoBlock): (IAssetBlo
         account: recipient,
         owner: recipient,
         locked: false,
-        nanoBlock: block,
-        traceLength: assetCrawler.traceLength
+        traceLength: assetCrawler.traceLength,
+        block_link:           block.link,
+        block_hash:           block.hash,
+        block_height:         block.height,
+        block_account:        block.account,
+        block_representative: block.representative,
+        block_type:           block.type,
+        block_subtype:        block.subtype,
+        block_amount:         block.amount
       };
     }
 
     const ownerAccount   = assetCrawler.frontier.owner;
     const payingAccount  = block.account;
-    const representative = block.representative as TAccount;
+    const representative = block.representative;
     const atomicSwapConditions: IAtomicSwapConditions = parseAtomicSwapRepresentative(representative);
-    const ownershipBlockHeight = BigInt(assetCrawler.frontier.nanoBlock.height);
+    const ownershipBlockHeight = BigInt(assetCrawler.frontier.block_height);
     const attemptTradeWithSelf = payingAccount == ownerAccount;
     const validReceiveHeight   = atomicSwapConditions && atomicSwapConditions.receiveHeight >= BigInt(2);
     const currentAssetHeight   = atomicSwapConditions && atomicSwapConditions.assetHeight === ownershipBlockHeight;
@@ -89,8 +95,15 @@ function toAssetBlock(assetCrawler: AssetCrawler, block: INanoBlock): (IAssetBlo
         account: payingAccount,
         owner: ownerAccount,
         locked: true,
-        nanoBlock: block,
-        traceLength: assetCrawler.traceLength
+        traceLength: assetCrawler.traceLength,
+        block_link: block.link,
+        block_hash: block.hash,
+        block_height: block.height,
+        block_account: block.account,
+        block_representative: block.representative,
+        block_type: block.type,
+        block_subtype: block.subtype,
+        block_amount: block.amount
       };
     }
   }

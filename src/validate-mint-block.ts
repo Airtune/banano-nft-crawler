@@ -1,11 +1,11 @@
 const bananojs = require("@bananocoin/bananojs");
 import { SUPPLY_HEX_PATTERN } from "./constants";
 import { accountDataType } from "./account-data-type";
-import { TAccount, TBlockHash } from "./types/banano";
 import { IMintBlock } from "./interfaces/mint-block";
+import { TAccount } from "nano-account-crawler/dist/nano-interfaces";
 
 function validateMintRepresentative(block: IMintBlock) {
-  const representative = block.representative as TAccount;
+  const representative = block.representative;
   const representativeType = accountDataType(representative);
   if (representativeType !== "unknown") {
     throw Error(`UnexpectedMintRepresentative: Expected representative to encode IPFS CID. Got type: ${representativeType} for ${representative}`);

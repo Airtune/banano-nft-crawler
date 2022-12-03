@@ -1,4 +1,4 @@
-import { INanoBlock } from "nano-account-crawler/dist/nano-interfaces";
+import { INanoBlock, TAccount, TBlockHash, TStringBigInt } from "nano-account-crawler/dist/nano-interfaces";
 import { NanoAccountForwardCrawler } from "nano-account-crawler/dist/nano-account-forward-crawler";
 import { NanoNode } from 'nano-account-crawler/dist/nano-node';
 
@@ -8,20 +8,19 @@ import {
   MAX_RPC_ITERATIONS,
   META_PROTOCOL_SUPPORTED_VERSIONS,
 } from "./constants";
-import { TAccount, TBlockHash } from "./types/banano";
 
 // Crawler to find all supply blocks by an issuer
 export class SupplyBlocksCrawler {
   private _head: TBlockHash;
   private _headHeight: number;
-  private _issuer: string;
-  private _offset: string;
+  private _issuer: TAccount;
+  private _offset: TStringBigInt;
   public ignoreMetadataRepresentatives: TAccount[];
   public supplyBlocks: INanoBlock[];
   public metadataRepresentatives: TAccount[];
   public frontierCheckedBlock: INanoBlock;
 
-  constructor(issuer: string, head: TBlockHash = undefined, offset: string = "0") {
+  constructor(issuer: TAccount, head: TBlockHash = undefined, offset: TStringBigInt = "0") {
     this._issuer = issuer;
     this._head = head;
     this._offset = offset;
@@ -42,14 +41,14 @@ export class SupplyBlocksCrawler {
     for await (const followedByBlock of banCrawler) {
       if (this.validateSupplyBlock(frontierCheckedBlock, followedByBlock, metadataRepresentatives)) {
         supplyBlocks.push(frontierCheckedBlock);
-        metadataRepresentatives.push(followedByBlock.representative as TAccount);
+        metadataRepresentatives.push(followedByBlock.representative);
       }
 
       // Cache followedByBlock that is ahead of block in next iteration
       frontierCheckedBlock = followedByBlock;
       this._head = frontierCheckedBlock.hash;
       this._headHeight = parseInt(frontierCheckedBlock.height);
-      if (this.validateSupplyRepresentative(frontierCheckedBlock.representative as TAccount)) {
+      if (this.validateSupplyRepresentative(frontierCheckedBlock.representative)) {
         this._offset = "-1";
       } else {
         this._offset = "0";
@@ -81,24 +80,24 @@ export class SupplyBlocksCrawler {
     }
 
     // Mint block representative must not be special accounts or contain a data encoding header.
-    if (accountDataType(followedByBlock.representative as TAccount) !== "unknown") {
+    if (accountDataType(followedByBlock.representative) !== "unknown") {
       return false;
     }
 
     // Supply block cannot reuse metadata representative
-    if (metadataRepresentatives.includes(followedByBlock.representative as TAccount)) {
+    if (metadataRepresentatives.includes(followedByBlock.representative)) {
       return false;
     }
-    if (this.ignoreMetadataRepresentatives.includes(followedByBlock.representative as TAccount)) {
+    if (this.ignoreMetadataRepresentatives.includes(followedByBlock.representative)) {
       return false;
     }
 
-    return this.validateSupplyRepresentative(block.representative as TAccount);
+    return this.validateSupplyRepresentative(block.representative);
   }
 
   private validateSupplyRepresentative(representative: TAccount): boolean {
     // Check if representative is a parsable supply_representative with a supported version
-    const supplyData = parseSupplyRepresentative(representative as TAccount);
+    const supplyData = parseSupplyRepresentative(representative);
     if (!supplyData) {
       return false;
     }

@@ -47,12 +47,12 @@ function atomicSwapReceivableCrawl(nanoNode, assetCrawler) {
             switch (_a.label) {
                 case 0:
                     sendAtomicSwap = assetCrawler.frontier;
-                    sendAtomicSwapHash = sendAtomicSwap.nanoBlock.hash;
-                    representative = sendAtomicSwap.nanoBlock.representative;
+                    sendAtomicSwapHash = sendAtomicSwap.block_hash;
+                    representative = sendAtomicSwap.block_representative;
                     atomicSwapConditions = (0, atomic_swap_1.parseAtomicSwapRepresentative)(representative);
                     // guard
                     if (typeof atomicSwapConditions === 'undefined') {
-                        throw Error("AtomicSwapError: Unable to parse conditions for representative: ".concat(sendAtomicSwap.nanoBlock.representative));
+                        throw Error("AtomicSwapError: Unable to parse conditions for representative: ".concat(sendAtomicSwap.block_representative));
                     }
                     payerAccount = sendAtomicSwap.account;
                     originalOwner = sendAtomicSwap.owner;
@@ -72,8 +72,15 @@ function atomicSwapReceivableCrawl(nanoNode, assetCrawler) {
                             account: originalOwner,
                             owner: originalOwner,
                             locked: false,
-                            nanoBlock: sendAtomicSwap.nanoBlock,
-                            traceLength: assetCrawler.traceLength
+                            traceLength: assetCrawler.traceLength,
+                            block_link: sendAtomicSwap.block_link,
+                            block_hash: sendAtomicSwap.block_hash,
+                            block_height: sendAtomicSwap.block_height,
+                            block_account: sendAtomicSwap.block_account,
+                            block_representative: sendAtomicSwap.block_representative,
+                            block_type: sendAtomicSwap.block_type,
+                            block_subtype: sendAtomicSwap.block_subtype,
+                            block_amount: sendAtomicSwap.block_amount
                         });
                         return [2 /*return*/, true];
                     }
@@ -92,8 +99,15 @@ function atomicSwapReceivableCrawl(nanoNode, assetCrawler) {
                             account: payerAccount,
                             owner: originalOwner,
                             locked: true,
-                            nanoBlock: receiveBlock,
-                            traceLength: assetCrawler.traceLength
+                            traceLength: assetCrawler.traceLength,
+                            block_link: receiveBlock.link,
+                            block_hash: receiveBlock.hash,
+                            block_height: receiveBlock.height,
+                            block_account: receiveBlock.account,
+                            block_representative: receiveBlock.representative,
+                            block_type: receiveBlock.type,
+                            block_subtype: receiveBlock.subtype,
+                            block_amount: receiveBlock.amount
                         });
                         assetCrawler.head = receiveBlock.hash;
                         assetCrawler.headHeight = parseInt(receiveBlock.height);
@@ -106,8 +120,15 @@ function atomicSwapReceivableCrawl(nanoNode, assetCrawler) {
                             account: originalOwner,
                             owner: originalOwner,
                             locked: false,
-                            nanoBlock: receiveBlock,
-                            traceLength: assetCrawler.traceLength
+                            traceLength: assetCrawler.traceLength,
+                            block_link: receiveBlock.link,
+                            block_hash: receiveBlock.hash,
+                            block_height: receiveBlock.height,
+                            block_account: receiveBlock.account,
+                            block_representative: receiveBlock.representative,
+                            block_type: receiveBlock.type,
+                            block_subtype: receiveBlock.subtype,
+                            block_amount: receiveBlock.amount
                         });
                         assetCrawler.assetChain.push({
                             state: 'owned',
@@ -115,11 +136,18 @@ function atomicSwapReceivableCrawl(nanoNode, assetCrawler) {
                             account: originalOwner,
                             owner: originalOwner,
                             locked: false,
-                            nanoBlock: sendAtomicSwap.nanoBlock,
-                            traceLength: assetCrawler.traceLength
+                            traceLength: assetCrawler.traceLength,
+                            block_link: sendAtomicSwap.block_link,
+                            block_hash: sendAtomicSwap.block_hash,
+                            block_height: sendAtomicSwap.block_height,
+                            block_account: sendAtomicSwap.block_account,
+                            block_representative: sendAtomicSwap.block_representative,
+                            block_type: sendAtomicSwap.block_type,
+                            block_subtype: sendAtomicSwap.block_subtype,
+                            block_amount: sendAtomicSwap.block_amount
                         });
-                        assetCrawler.head = sendAtomicSwap.nanoBlock.hash;
-                        assetCrawler.headHeight = parseInt(sendAtomicSwap.nanoBlock.height);
+                        assetCrawler.head = sendAtomicSwap.block_hash;
+                        assetCrawler.headHeight = parseInt(sendAtomicSwap.block_height);
                     }
                     return [2 /*return*/, true];
             }

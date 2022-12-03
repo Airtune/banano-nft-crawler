@@ -1,8 +1,8 @@
 import { NanoAccountBackwardCrawler } from "nano-account-crawler/dist/nano-account-backward-crawler";
-import { INanoBlock } from "nano-account-crawler/dist/nano-interfaces";
+import { INanoBlock, TAccount } from "nano-account-crawler/dist/nano-interfaces";
 import { NanoNode } from "nano-account-crawler/dist/nano-node";
 
-export async function findReceiveBlock(nanoNode: NanoNode, senderAccount: string, sendHash: string, receiverAccount: string): Promise<({success: boolean, block: INanoBlock|undefined})> {
+export async function findReceiveBlock(nanoNode: NanoNode, senderAccount: TAccount, sendHash: string, receiverAccount: TAccount): Promise<({success: boolean, block: INanoBlock|undefined})> {
   try {
     // Variant that filters by senderAccount (!!!)
     //const nanoBackwardIterable = new NanoAccountBackwardCrawler(nanoNode, receiverAccount, undefined, [senderAccount]);

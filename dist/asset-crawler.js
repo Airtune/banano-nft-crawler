@@ -127,7 +127,7 @@ var AssetCrawler = /** @class */ (function () {
                         if (!(typeof stateCrawlFn == "function")) return [3 /*break*/, 2];
                         return [4 /*yield*/, stateCrawlFn(nanoNode, this).catch(function (error) { throw (error); })];
                     case 1: return [2 /*return*/, _a.sent()];
-                    case 2: throw Error("UnhandledAssetState: \"".concat(this.frontier.state, "\" was not handled for block: ").concat(this.frontier.nanoBlock.hash));
+                    case 2: throw Error("UnhandledAssetState: \"".concat(this.frontier.state, "\" was not handled for block: ").concat(this.frontier.block_hash));
                 }
             });
         });
@@ -141,7 +141,7 @@ var AssetCrawler = /** @class */ (function () {
         if (sendAtomicSwap === undefined) {
             return undefined;
         }
-        var atomicSwapRepresentative = sendAtomicSwap.nanoBlock.representative;
+        var atomicSwapRepresentative = sendAtomicSwap.block_representative;
         var atomicSwapConditions = (0, atomic_swap_1.parseAtomicSwapRepresentative)(atomicSwapRepresentative);
         return atomicSwapConditions;
     };

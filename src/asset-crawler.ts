@@ -1,10 +1,7 @@
-// interfaces
-import { INanoBlock } from "nano-account-crawler/dist/nano-interfaces";
+// types and interfaces
+import { INanoBlock, TAccount, TBlockHash } from "nano-account-crawler/dist/nano-interfaces";
 import { IAssetBlock } from "./interfaces/asset-block";
 import { IAtomicSwapConditions } from "./interfaces/atomic-swap-conditions";
-
-// types
-import { TAccount, TBlockHash } from "./types/banano";
 
 // packages
 import { NanoNode } from 'nano-account-crawler/dist/nano-node';
@@ -37,21 +34,21 @@ const assetCrawlerStates = {
 // Crawler to trace the chain following a single mint of an asset.
 export class AssetCrawler {
   private _assetChain: IAssetBlock[];
-  private _assetRepresentative: string;
+  private _assetRepresentative: TAccount;
   private _head: TBlockHash;
   private _headHeight: number;
   private _metadataRepresentative: string;
-  private _issuer: string;
+  private _issuer: TAccount;
   private _mintBlock: INanoBlock;
   private _traceLength: bigint;
 
   public activeAtomicSwap: IAssetBlock;
   public activeAtomicSwapDelegation: IAssetBlock;
-  public owner: string;
+  public owner: TAccount;
   public locked: boolean;
-  public lockedInAccount: string;
+  public lockedInAccount: TAccount;
 
-  constructor(issuer: string, mintBlock: INanoBlock) {
+  constructor(issuer: TAccount, mintBlock: INanoBlock) {
     this._issuer = issuer;
     this._mintBlock = mintBlock;
     this._assetChain = [];
@@ -70,7 +67,7 @@ export class AssetCrawler {
     await this.crawlFromFrontier(nanoNode, maxTraceLength);
   }
 
-  initFromCache(assetRepresentative: string, assetChain: IAssetBlock[], initialTraceLength: bigint = undefined) {
+  initFromCache(assetRepresentative: TAccount, assetChain: IAssetBlock[], initialTraceLength: bigint = undefined) {
     this._assetRepresentative = assetRepresentative;
     this._assetChain = assetChain;
     this._traceLength = initialTraceLength || this._traceLength;
@@ -92,7 +89,7 @@ export class AssetCrawler {
     if (typeof stateCrawlFn == "function") {
       return await stateCrawlFn(nanoNode, this).catch((error) => { throw(error) });
     } else {
-      throw Error(`UnhandledAssetState: "${this.frontier.state}" was not handled for block: ${this.frontier.nanoBlock.hash}`);
+      throw Error(`UnhandledAssetState: "${this.frontier.state}" was not handled for block: ${this.frontier.block_hash}`);
     }
   }
 
@@ -105,7 +102,7 @@ export class AssetCrawler {
     const sendAtomicSwap: IAssetBlock = this.findSendAtomicSwapBlock();
     if (sendAtomicSwap === undefined) { return undefined; }
 
-    const atomicSwapRepresentative: TAccount = sendAtomicSwap.nanoBlock.representative as TAccount;
+    const atomicSwapRepresentative: TAccount = sendAtomicSwap.block_representative;
     const atomicSwapConditions: IAtomicSwapConditions = parseAtomicSwapRepresentative(atomicSwapRepresentative);
 
     return atomicSwapConditions;

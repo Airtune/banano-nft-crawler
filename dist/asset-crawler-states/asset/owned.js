@@ -56,7 +56,7 @@ function ownedCrawl(nanoNode, assetCrawler) {
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
-                    frontierCrawler = new nano_account_forward_crawler_1.NanoAccountForwardCrawler(nanoNode, assetCrawler.frontier.owner, assetCrawler.frontier.nanoBlock.hash, "1");
+                    frontierCrawler = new nano_account_forward_crawler_1.NanoAccountForwardCrawler(nanoNode, assetCrawler.frontier.owner, assetCrawler.frontier.block_hash, "1");
                     _b.label = 1;
                 case 1:
                     _b.trys.push([1, 15, , 16]);
@@ -132,15 +132,22 @@ function toAssetBlock(assetCrawler, block) {
                 account: recipient,
                 owner: recipient,
                 locked: false,
-                nanoBlock: block,
-                traceLength: assetCrawler.traceLength
+                traceLength: assetCrawler.traceLength,
+                block_link: block.link,
+                block_hash: block.hash,
+                block_height: block.height,
+                block_account: block.account,
+                block_representative: block.representative,
+                block_type: block.type,
+                block_subtype: block.subtype,
+                block_amount: block.amount
             };
         }
         var ownerAccount = assetCrawler.frontier.owner;
         var payingAccount = block.account;
         var representative = block.representative;
         var atomicSwapConditions = (0, atomic_swap_1.parseAtomicSwapRepresentative)(representative);
-        var ownershipBlockHeight = BigInt(assetCrawler.frontier.nanoBlock.height);
+        var ownershipBlockHeight = BigInt(assetCrawler.frontier.block_height);
         var attemptTradeWithSelf = payingAccount == ownerAccount;
         var validReceiveHeight = atomicSwapConditions && atomicSwapConditions.receiveHeight >= BigInt(2);
         var currentAssetHeight = atomicSwapConditions && atomicSwapConditions.assetHeight === ownershipBlockHeight;
@@ -153,8 +160,15 @@ function toAssetBlock(assetCrawler, block) {
                 account: payingAccount_1,
                 owner: ownerAccount,
                 locked: true,
-                nanoBlock: block,
-                traceLength: assetCrawler.traceLength
+                traceLength: assetCrawler.traceLength,
+                block_link: block.link,
+                block_hash: block.hash,
+                block_height: block.height,
+                block_account: block.account,
+                block_representative: block.representative,
+                block_type: block.type,
+                block_subtype: block.subtype,
+                block_amount: block.amount
             };
         }
     }

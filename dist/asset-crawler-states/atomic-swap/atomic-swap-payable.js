@@ -55,7 +55,7 @@ function atomicSwapPayableCrawl(nanoNode, assetCrawler) {
             switch (_b.label) {
                 case 0:
                     payingAccount = assetCrawler.frontier.account;
-                    paymentHeight = BigInt(assetCrawler.frontier.nanoBlock.height) + BigInt(1);
+                    paymentHeight = BigInt(assetCrawler.frontier.block_height) + BigInt(1);
                     return [4 /*yield*/, (0, find_block_at_height_and_previous_block_1.findBlockAtHeightAndPreviousBlock)(nanoNode, payingAccount, paymentHeight)];
                 case 1:
                     _a = _b.sent(), previousBlock = _a[0], nextBlock = _a[1];
@@ -78,8 +78,15 @@ function atomicSwapPayableCrawl(nanoNode, assetCrawler) {
                             account: payingAccount,
                             owner: payingAccount,
                             locked: false,
-                            nanoBlock: nextBlock,
-                            traceLength: assetCrawler.traceLength
+                            traceLength: assetCrawler.traceLength,
+                            block_link: nextBlock.link,
+                            block_hash: nextBlock.hash,
+                            block_height: nextBlock.height,
+                            block_account: nextBlock.account,
+                            block_representative: nextBlock.representative,
+                            block_type: nextBlock.type,
+                            block_subtype: nextBlock.subtype,
+                            block_amount: nextBlock.amount
                         });
                         assetCrawler.head = nextBlock.hash;
                         assetCrawler.headHeight = parseInt(nextBlock.height);
@@ -101,8 +108,15 @@ function atomicSwapPayableCrawl(nanoNode, assetCrawler) {
                             account: originalOwner,
                             owner: originalOwner,
                             locked: false,
-                            nanoBlock: nextBlock,
-                            traceLength: assetCrawler.traceLength
+                            traceLength: assetCrawler.traceLength,
+                            block_link: nextBlock.link,
+                            block_hash: nextBlock.hash,
+                            block_height: nextBlock.height,
+                            block_account: nextBlock.account,
+                            block_representative: nextBlock.representative,
+                            block_type: nextBlock.type,
+                            block_subtype: nextBlock.subtype,
+                            block_amount: nextBlock.amount
                         });
                         assetCrawler.assetChain.push({
                             state: "owned",
@@ -110,11 +124,18 @@ function atomicSwapPayableCrawl(nanoNode, assetCrawler) {
                             account: originalOwner,
                             owner: originalOwner,
                             locked: false,
-                            nanoBlock: sendAtomicSwap.nanoBlock,
-                            traceLength: assetCrawler.traceLength
+                            traceLength: assetCrawler.traceLength,
+                            block_link: sendAtomicSwap.block_link,
+                            block_hash: sendAtomicSwap.block_hash,
+                            block_height: sendAtomicSwap.block_height,
+                            block_account: sendAtomicSwap.block_account,
+                            block_representative: sendAtomicSwap.block_representative,
+                            block_type: sendAtomicSwap.block_type,
+                            block_subtype: sendAtomicSwap.block_subtype,
+                            block_amount: sendAtomicSwap.block_amount
                         });
-                        assetCrawler.head = sendAtomicSwap.nanoBlock.hash;
-                        assetCrawler.headHeight = parseInt(sendAtomicSwap.nanoBlock.height);
+                        assetCrawler.head = sendAtomicSwap.block_hash;
+                        assetCrawler.headHeight = parseInt(sendAtomicSwap.block_height);
                     }
                     return [2 /*return*/, true];
             }

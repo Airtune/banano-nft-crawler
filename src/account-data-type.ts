@@ -1,5 +1,5 @@
 // types
-import { TAccount } from "./types/banano";
+import { TAccount } from "nano-account-crawler/dist/nano-interfaces";
 
 // src
 import {

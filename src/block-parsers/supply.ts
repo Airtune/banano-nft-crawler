@@ -1,6 +1,6 @@
+import { TAccount } from "nano-account-crawler/dist/nano-interfaces";
 import { SUPPLY_HEX_PATTERN, FINISH_SUPPLY_HEX_PATTERN } from "../constants";
 import { getBananoAccountPublicKey } from "../lib/get-banano-account-public-key";
-import { TAccount } from "../types/banano";
 
 export function parseSupplyRepresentative(representative: TAccount): { version: string, maxSupply: bigint } {
   const supplyHex = getBananoAccountPublicKey(representative);

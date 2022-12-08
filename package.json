@@ -18,7 +18,7 @@
   "dependencies": {
     "@bananocoin/bananojs": "^2.6.2",
     "chai-as-promised": "^7.1.1",
-    "nano-account-crawler": "^1.0.23",
+    "nano-account-crawler": "1.0.24",
     "nano-ipfs": "^1.0.4",
     "node-fetch": "^2.6.1"
   },

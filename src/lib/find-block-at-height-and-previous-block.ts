@@ -9,29 +9,25 @@ export async function findBlockAtHeightAndPreviousBlock(nanoNode: NanoNode, acco
 
   try {
     const nanoBackwardIterable = new NanoAccountBackwardCrawler(nanoNode, account);
-    try {
-      await nanoBackwardIterable.initialize().catch((error) => { throw(error); });
+    await nanoBackwardIterable.initialize().catch((error) => { throw(error); });
 
-      for await (const _block of nanoBackwardIterable) {
-        let _height = BigInt(_block.height);
-        if (_height === height) {
-          block = _block;
-        } else if (_height === previousHeight) {
-          previousBlock = _block;
-        } else if (_height < previousHeight) {
-          break;
-        }
-      }
-    } catch (error) {
-      if (error.message.match(/^NanoNodeError:/)) {
-        return undefined;
-      } else {
-        throw(error);
+    for await (const _block of nanoBackwardIterable) {
+      let _height = BigInt(_block.height);
+      if (_height === height) {
+        block = _block;
+      } else if (_height === previousHeight) {
+        previousBlock = _block;
+      } else if (_height < previousHeight) {
+        break;
       }
     }
 
     return [previousBlock, block];
-  } catch(error) {
-    throw(error);
+  } catch (error) {
+    if (error.message.match(/^NanoNodeError:/)) {
+      return undefined;
+    } else {
+      throw(error);
+    }
   }
 }

@@ -48,7 +48,7 @@ var nano_account_backward_crawler_1 = require("nano-account-crawler/dist/nano-ac
 function findBlockAtHeightAndPreviousBlock(nanoNode, account, height) {
     var e_1, _a;
     return __awaiter(this, void 0, void 0, function () {
-        var previousHeight, previousBlock, block, nanoBackwardIterable, nanoBackwardIterable_1, nanoBackwardIterable_1_1, _block, _height, e_1_1, error_1, error_2;
+        var previousHeight, previousBlock, block, nanoBackwardIterable, nanoBackwardIterable_1, nanoBackwardIterable_1_1, _block, _height, e_1_1, error_1;
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
@@ -57,22 +57,19 @@ function findBlockAtHeightAndPreviousBlock(nanoNode, account, height) {
                     block = undefined;
                     _b.label = 1;
                 case 1:
-                    _b.trys.push([1, 18, , 19]);
+                    _b.trys.push([1, 15, , 16]);
                     nanoBackwardIterable = new nano_account_backward_crawler_1.NanoAccountBackwardCrawler(nanoNode, account);
-                    _b.label = 2;
-                case 2:
-                    _b.trys.push([2, 16, , 17]);
                     return [4 /*yield*/, nanoBackwardIterable.initialize().catch(function (error) { throw (error); })];
-                case 3:
+                case 2:
                     _b.sent();
-                    _b.label = 4;
-                case 4:
-                    _b.trys.push([4, 9, 10, 15]);
+                    _b.label = 3;
+                case 3:
+                    _b.trys.push([3, 8, 9, 14]);
                     nanoBackwardIterable_1 = __asyncValues(nanoBackwardIterable);
-                    _b.label = 5;
-                case 5: return [4 /*yield*/, nanoBackwardIterable_1.next()];
-                case 6:
-                    if (!(nanoBackwardIterable_1_1 = _b.sent(), !nanoBackwardIterable_1_1.done)) return [3 /*break*/, 8];
+                    _b.label = 4;
+                case 4: return [4 /*yield*/, nanoBackwardIterable_1.next()];
+                case 5:
+                    if (!(nanoBackwardIterable_1_1 = _b.sent(), !nanoBackwardIterable_1_1.done)) return [3 /*break*/, 7];
                     _block = nanoBackwardIterable_1_1.value;
                     _height = BigInt(_block.height);
                     if (_height === height) {
@@ -82,29 +79,29 @@ function findBlockAtHeightAndPreviousBlock(nanoNode, account, height) {
                         previousBlock = _block;
                     }
                     else if (_height < previousHeight) {
-                        return [3 /*break*/, 8];
+                        return [3 /*break*/, 7];
                     }
-                    _b.label = 7;
-                case 7: return [3 /*break*/, 5];
-                case 8: return [3 /*break*/, 15];
-                case 9:
+                    _b.label = 6;
+                case 6: return [3 /*break*/, 4];
+                case 7: return [3 /*break*/, 14];
+                case 8:
                     e_1_1 = _b.sent();
                     e_1 = { error: e_1_1 };
-                    return [3 /*break*/, 15];
-                case 10:
-                    _b.trys.push([10, , 13, 14]);
-                    if (!(nanoBackwardIterable_1_1 && !nanoBackwardIterable_1_1.done && (_a = nanoBackwardIterable_1.return))) return [3 /*break*/, 12];
+                    return [3 /*break*/, 14];
+                case 9:
+                    _b.trys.push([9, , 12, 13]);
+                    if (!(nanoBackwardIterable_1_1 && !nanoBackwardIterable_1_1.done && (_a = nanoBackwardIterable_1.return))) return [3 /*break*/, 11];
                     return [4 /*yield*/, _a.call(nanoBackwardIterable_1)];
-                case 11:
+                case 10:
                     _b.sent();
-                    _b.label = 12;
-                case 12: return [3 /*break*/, 14];
-                case 13:
+                    _b.label = 11;
+                case 11: return [3 /*break*/, 13];
+                case 12:
                     if (e_1) throw e_1.error;
                     return [7 /*endfinally*/];
-                case 14: return [7 /*endfinally*/];
-                case 15: return [3 /*break*/, 17];
-                case 16:
+                case 13: return [7 /*endfinally*/];
+                case 14: return [2 /*return*/, [previousBlock, block]];
+                case 15:
                     error_1 = _b.sent();
                     if (error_1.message.match(/^NanoNodeError:/)) {
                         return [2 /*return*/, undefined];
@@ -112,12 +109,8 @@ function findBlockAtHeightAndPreviousBlock(nanoNode, account, height) {
                     else {
                         throw (error_1);
                     }
-                    return [3 /*break*/, 17];
-                case 17: return [2 /*return*/, [previousBlock, block]];
-                case 18:
-                    error_2 = _b.sent();
-                    throw (error_2);
-                case 19: return [2 /*return*/];
+                    return [3 /*break*/, 16];
+                case 16: return [2 /*return*/];
             }
         });
     });

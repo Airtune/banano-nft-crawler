@@ -48,16 +48,15 @@ var nano_account_backward_crawler_1 = require("nano-account-crawler/dist/nano-ac
 function findReceiveBlock(nanoNode, senderAccount, sendHash, receiverAccount) {
     var e_1, _a;
     return __awaiter(this, void 0, void 0, function () {
-        var nanoBackwardIterable, headBlock, nanoBackwardIterable_1, nanoBackwardIterable_1_1, block, e_1_1, error_1;
+        var headBlock, nanoBackwardIterable, nanoBackwardIterable_1, nanoBackwardIterable_1_1, block, e_1_1, error_1;
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
                     _b.trys.push([0, 14, , 15]);
                     nanoBackwardIterable = new nano_account_backward_crawler_1.NanoAccountBackwardCrawler(nanoNode, receiverAccount, undefined);
-                    return [4 /*yield*/, nanoBackwardIterable.initialize()];
+                    return [4 /*yield*/, nanoBackwardIterable.initialize().catch(function (error) { throw (error); })];
                 case 1:
                     _b.sent();
-                    headBlock = void 0;
                     _b.label = 2;
                 case 2:
                     _b.trys.push([2, 7, 8, 13]);
@@ -93,7 +92,14 @@ function findReceiveBlock(nanoNode, senderAccount, sendHash, receiverAccount) {
                 case 13: return [2 /*return*/, { success: false, block: headBlock }];
                 case 14:
                     error_1 = _b.sent();
-                    throw (error_1);
+                    if (error_1.message.match(/^NanoNodeError:/)) {
+                        // catch NanoNodeError, e.g., when the account isn't opened yet
+                        return [2 /*return*/, { success: false, block: headBlock }];
+                    }
+                    else {
+                        throw (error_1);
+                    }
+                    return [3 /*break*/, 15];
                 case 15: return [2 /*return*/];
             }
         });

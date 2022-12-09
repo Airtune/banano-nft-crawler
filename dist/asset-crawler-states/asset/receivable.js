@@ -52,7 +52,7 @@ function receivableCrawl(nanoNode, assetCrawler) {
                         sender = assetCrawler.previousFrontier.owner;
                     }
                     recipient = assetCrawler.frontier.owner;
-                    return [4 /*yield*/, (0, find_receive_block_1.findReceiveBlock)(nanoNode, sender, sendBlockHash, recipient)];
+                    return [4 /*yield*/, (0, find_receive_block_1.findReceiveBlock)(nanoNode, sender, sendBlockHash, recipient).catch(function (error) { throw (error); })];
                 case 1:
                     _a = _b.sent(), success = _a.success, block = _a.block;
                     // guards

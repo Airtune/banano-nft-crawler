@@ -22,8 +22,12 @@ export async function atomicSwapReceivableCrawl(nanoNode: NanoNode, assetCrawler
 
   // NB: Trace length from findBlockAtHeight might be significantly larger than 1.
   assetCrawler.traceLength += BigInt(1);
-  const blocks = await findBlockAtHeightAndPreviousBlock(nanoNode, payerAccount, atomicSwapConditions.receiveHeight);
-  const [previousBlock, receiveBlock] = blocks;
+  const prevAndNextBlock = await findBlockAtHeightAndPreviousBlock(nanoNode, payerAccount, atomicSwapConditions.receiveHeight).catch((error) => { throw(error); });
+  // guard
+  if (prevAndNextBlock == undefined) {
+    return false;
+  }
+  const [previousBlock, receiveBlock] = prevAndNextBlock;
 
   if (previousBlock === undefined) { return false; }
   if (BigInt(previousBlock.balance) < atomicSwapConditions.minRaw) {

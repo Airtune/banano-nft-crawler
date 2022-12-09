@@ -68,6 +68,20 @@ describe('AssetCrawler', function () {
     await testSlice(0, 3);
   });
 
+  it("can trace asset leading into unopened account while handling the nano node error for requesting account info", async () => {
+    // NB: Using production data. Unopened account ban_1ekkobopkdwtuqb88zeixrw3pwsm67ypsjnrzted7rndjxr3e5bhthokycc4
+    // that didn't receive the send#mint may be opened in the future.
+    const issuer = "ban_1akukyw6enjwr4ptwaojnmiur5xpixo7t9gdxgs7i1w5pqjqp9f7z9u3t48n";
+    const mintSendBlockHash = "07FE197B057E1FB1145C969E965EBA5B7F6A60E2085431E8D91917ECD9FAD8DB";
+    const mintBlock = await getBlock(bananode, issuer, mintSendBlockHash).catch((error) => { throw(error) });
+    if (mintBlock === undefined) { throw 'undefined mintBlock'; }
+    const assetCrawler = new AssetCrawler(issuer, mintBlock);
+    await assetCrawler.crawl(bananode);
+
+    expect(assetCrawler.frontier.account).to.equal("ban_1ekkobopkdwtuqb88zeixrw3pwsm67ypsjnrzted7rndjxr3e5bhthokycc4");
+    expect(assetCrawler.frontier.state).to.equal("receivable");
+  });
+
   it("confirms change#mint > send#asset > receive#asset", async () => {
     const recipient: TAccount = "ban_1twos81eoq9s6d1asht5wwz53m9kw7hkuajad1m4u5otgcsb4qstymquhahf";
     const mintBlockHash = "F61CCF94D6E5CFE9601C436ACC3976AF876D1DA21909FEB88B629BEDEC4DF1EA";

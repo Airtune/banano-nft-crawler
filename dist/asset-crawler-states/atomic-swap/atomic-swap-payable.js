@@ -50,15 +50,21 @@ function validPayment(previousBlock, nextBlock, sendAtomicSwap, atomicSwapCondit
 // State for when receive#atomic_swap is confirmed but send#payment hasn't been sent yet.
 function atomicSwapPayableCrawl(nanoNode, assetCrawler) {
     return __awaiter(this, void 0, void 0, function () {
-        var payingAccount, paymentHeight, _a, previousBlock, nextBlock, sendAtomicSwap, atomicSwapConditions, originalOwner, type;
-        return __generator(this, function (_b) {
-            switch (_b.label) {
+        var payingAccount, paymentHeight, prevAndNextBlock, previousBlock, nextBlock, sendAtomicSwap, atomicSwapConditions, originalOwner, type;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
                 case 0:
                     payingAccount = assetCrawler.frontier.account;
                     paymentHeight = BigInt(assetCrawler.frontier.block_height) + BigInt(1);
                     return [4 /*yield*/, (0, find_block_at_height_and_previous_block_1.findBlockAtHeightAndPreviousBlock)(nanoNode, payingAccount, paymentHeight)];
                 case 1:
-                    _a = _b.sent(), previousBlock = _a[0], nextBlock = _a[1];
+                    prevAndNextBlock = _a.sent();
+                    // Guard. Should not happen since this point shouldn't be reached for unopened accounts given
+                    // the users followed client protocol and checked that the account was opened before initiating a swap.
+                    if (prevAndNextBlock == undefined) {
+                        return [2 /*return*/, false];
+                    }
+                    previousBlock = prevAndNextBlock[0], nextBlock = prevAndNextBlock[1];
                     sendAtomicSwap = assetCrawler.findSendAtomicSwapBlock();
                     // guards
                     if (nextBlock === undefined || sendAtomicSwap === undefined) {

@@ -15,7 +15,7 @@ export async function receivableCrawl(nanoNode: NanoNode, assetCrawler: AssetCra
   }
 
   const recipient = assetCrawler.frontier.owner;
-  const { success, block } = await findReceiveBlock(nanoNode, sender, sendBlockHash, recipient);
+  const { success, block } = await findReceiveBlock(nanoNode, sender, sendBlockHash, recipient).catch((error) => { throw(error); });
   // guards
   if (typeof block === 'undefined') { return false; }
   assetCrawler.traceLength += BigInt(1);

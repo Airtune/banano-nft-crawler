@@ -42,7 +42,7 @@ var find_block_at_height_and_previous_block_1 = require("../../lib/find-block-at
 // State for when send#atomic_swap is confirmed and receive#atomic_swap is ready to be received but hasn't been confirmed yet.
 function atomicSwapReceivableCrawl(nanoNode, assetCrawler) {
     return __awaiter(this, void 0, void 0, function () {
-        var sendAtomicSwap, sendAtomicSwapHash, representative, atomicSwapConditions, payerAccount, originalOwner, blocks, previousBlock, receiveBlock, isReceive, receivesAtomicSwap, hasCorrectHeight, representativeUnchanged;
+        var sendAtomicSwap, sendAtomicSwapHash, representative, atomicSwapConditions, payerAccount, originalOwner, prevAndNextBlock, previousBlock, receiveBlock, isReceive, receivesAtomicSwap, hasCorrectHeight, representativeUnchanged;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -58,10 +58,14 @@ function atomicSwapReceivableCrawl(nanoNode, assetCrawler) {
                     originalOwner = sendAtomicSwap.owner;
                     // NB: Trace length from findBlockAtHeight might be significantly larger than 1.
                     assetCrawler.traceLength += BigInt(1);
-                    return [4 /*yield*/, (0, find_block_at_height_and_previous_block_1.findBlockAtHeightAndPreviousBlock)(nanoNode, payerAccount, atomicSwapConditions.receiveHeight)];
+                    return [4 /*yield*/, (0, find_block_at_height_and_previous_block_1.findBlockAtHeightAndPreviousBlock)(nanoNode, payerAccount, atomicSwapConditions.receiveHeight).catch(function (error) { throw (error); })];
                 case 1:
-                    blocks = _a.sent();
-                    previousBlock = blocks[0], receiveBlock = blocks[1];
+                    prevAndNextBlock = _a.sent();
+                    // guard
+                    if (prevAndNextBlock == undefined) {
+                        return [2 /*return*/, false];
+                    }
+                    previousBlock = prevAndNextBlock[0], receiveBlock = prevAndNextBlock[1];
                     if (previousBlock === undefined) {
                         return [2 /*return*/, false];
                     }

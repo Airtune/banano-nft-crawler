@@ -1,6 +1,6 @@
 {
   "name": "banano-nft-crawler",
-  "version": "1.1.10",
+  "version": "1.1.11",
   "description": "Library for crawling across the Banano ledger to trace NFTs.",
   "files": [
     "dist/**/*.*",
@@ -11,7 +11,8 @@
     "test": "mocha --require ts-node/register ./test/*.spec.ts",
     "testSupplyBlocksCrawler": "mocha --require ts-node/register ./test/supply-blocks-crawler.spec.ts",
     "testMintBlocksCrawler": "mocha --require ts-node/register ./test/mint-blocks-crawler.spec.ts",
-    "testAssetCrawler": "mocha --require ts-node/register ./test/asset-crawler.spec.ts"
+    "testAssetCrawler": "mocha --require ts-node/register ./test/asset-crawler.spec.ts",
+    "testFindReceiveBlock": "mocha --require ts-node/register ./test/find-receive-block.spec.ts"
   },
   "author": "Airtune",
   "license": "MIT",

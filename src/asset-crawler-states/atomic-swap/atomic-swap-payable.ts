@@ -24,7 +24,13 @@ function validPayment(previousBlock: INanoBlock, nextBlock: INanoBlock, sendAtom
 export async function atomicSwapPayableCrawl(nanoNode: NanoNode, assetCrawler: AssetCrawler): Promise<boolean> {
   const payingAccount = assetCrawler.frontier.account;
   const paymentHeight = BigInt(assetCrawler.frontier.block_height) + BigInt(1);
-  const [previousBlock, nextBlock]: [INanoBlock, INanoBlock] = await findBlockAtHeightAndPreviousBlock(nanoNode, payingAccount, paymentHeight);
+  const prevAndNextBlock = await findBlockAtHeightAndPreviousBlock(nanoNode, payingAccount, paymentHeight);
+  // Guard. Should not happen since this point shouldn't be reached for unopened accounts given
+  // the users followed client protocol and checked that the account was opened before initiating a swap.
+  if (prevAndNextBlock == undefined) {
+    return false;
+  }
+  const [previousBlock, nextBlock]: [INanoBlock, INanoBlock] = prevAndNextBlock;
   const sendAtomicSwap: IAssetBlock = assetCrawler.findSendAtomicSwapBlock();
   // guards
   if (nextBlock === undefined || sendAtomicSwap === undefined) {

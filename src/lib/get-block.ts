@@ -10,6 +10,10 @@ export const getBlock = async (nanoNode: NanoNode, account: TAccount, hash: stri
 
     return block;
   } catch(error) {
-    throw(error);
+    if (error.message.match(/^NanoNodeError:/)) {
+      return undefined;
+    } else {
+      throw error;
+    }
   }
 };

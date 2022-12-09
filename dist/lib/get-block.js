@@ -50,7 +50,13 @@ var getBlock = function (nanoNode, account, hash) { return __awaiter(void 0, voi
                 return [2 /*return*/, block];
             case 2:
                 error_1 = _a.sent();
-                throw (error_1);
+                if (error_1.message.match(/^NanoNodeError:/)) {
+                    return [2 /*return*/, undefined];
+                }
+                else {
+                    throw error_1;
+                }
+                return [3 /*break*/, 3];
             case 3: return [2 /*return*/];
         }
     });

@@ -63,7 +63,7 @@ export async function atomicSwapPayableCrawl(nanoNode: NanoNode, assetCrawler: A
       block_link: nextBlock.link,
       block_hash: nextBlock.hash,
       block_height: nextBlock.height,
-      block_account: nextBlock.account,
+      block_account: payingAccount,
       block_representative: nextBlock.representative,
       block_type: nextBlock.type,
       block_subtype: nextBlock.subtype,
@@ -95,12 +95,13 @@ export async function atomicSwapPayableCrawl(nanoNode: NanoNode, assetCrawler: A
       block_link: nextBlock.link,
       block_hash: nextBlock.hash,
       block_height: nextBlock.height,
-      block_account: nextBlock.account,
+      block_account: payingAccount,
       block_representative: nextBlock.representative,
       block_type: nextBlock.type,
       block_subtype: nextBlock.subtype,
       block_amount: nextBlock.amount
     });
+    // TODO: Maybe specify what info should be used here
     assetCrawler.assetChain.push({
       state: "owned",
       type: "send#returned_to_sender", // essentially ignored because state on the line above is owned

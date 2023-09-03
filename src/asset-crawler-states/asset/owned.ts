@@ -22,7 +22,8 @@ import { parseAtomicSwapRepresentative } from "../../block-parsers/atomic-swap";
 // State for when the the block's account own the asset.
 export async function ownedCrawl(nanoNode: NanoNode, assetCrawler: AssetCrawler): Promise<IStatusReturn<boolean>> {
   // trace forward in account history from frontier block
-  let frontierCrawler = new NanoAccountForwardCrawler(nanoNode, assetCrawler.frontier.owner, assetCrawler.frontier.block_hash, "1");
+  const crawl_account = assetCrawler.frontier.owner;
+  let frontierCrawler = new NanoAccountForwardCrawler(nanoNode, crawl_account, assetCrawler.frontier.block_hash, "1");
 
   try {
     const initializeStatusReturn = await frontierCrawler.initialize();
@@ -42,7 +43,8 @@ export async function ownedCrawl(nanoNode: NanoNode, assetCrawler: AssetCrawler)
       assetCrawler.head = nanoBlock.hash;
       assetCrawler.headHeight = parseInt(nanoBlock.height);
 
-      const assetBlock: IAssetBlock = toAssetBlock(assetCrawler, nanoBlock);
+      
+      const assetBlock: IAssetBlock = toAssetBlock(assetCrawler, nanoBlock, crawl_account);
       if (assetBlock === undefined) { continue; }
 
       assetCrawler.assetChain.push(assetBlock);
@@ -60,7 +62,7 @@ export async function ownedCrawl(nanoNode: NanoNode, assetCrawler: AssetCrawler)
 }
 
 
-function toAssetBlock(assetCrawler: AssetCrawler, block: INanoBlock): (IAssetBlock|undefined) {
+function toAssetBlock(assetCrawler: AssetCrawler, block: INanoBlock, crawl_account: TAccount): (IAssetBlock|undefined) {
   if (block.type !== 'state') { return undefined; }
 
   if (block.subtype === 'send') {
@@ -86,7 +88,7 @@ function toAssetBlock(assetCrawler: AssetCrawler, block: INanoBlock): (IAssetBlo
         block_link:           block.link,
         block_hash:           block.hash,
         block_height:         block.height,
-        block_account:        block.account,
+        block_account:        crawl_account,
         block_representative: block.representative,
         block_type:           block.type,
         block_subtype:        block.subtype,
@@ -115,7 +117,7 @@ function toAssetBlock(assetCrawler: AssetCrawler, block: INanoBlock): (IAssetBlo
         block_link: block.link,
         block_hash: block.hash,
         block_height: block.height,
-        block_account: block.account,
+        block_account: crawl_account,
         block_representative: block.representative,
         block_type: block.type,
         block_subtype: block.subtype,

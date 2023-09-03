@@ -32,6 +32,8 @@ export async function atomicSwapReceivableCrawl(nanoNode: NanoNode, assetCrawler
   const [previousBlock, receiveBlock] = prevAndNextBlock;
 
   if (previousBlock === undefined) { return { status: "error", error_type: "BlockNotFoundError", message: "Previous block is not found" } }
+  // TODO: Specify here what info should be displayed for the sake of displaying history correctly.
+  // This is when the receiving account doesn't have high enough balance and the NFT is returned immediately.
   if (BigInt(previousBlock.balance) < atomicSwapConditions.minRaw) {
     assetCrawler.assetChain.push({
       state: "owned",

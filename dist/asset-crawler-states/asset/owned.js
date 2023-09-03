@@ -52,11 +52,12 @@ var atomic_swap_1 = require("../../block-parsers/atomic-swap");
 function ownedCrawl(nanoNode, assetCrawler) {
     var _a, e_1, _b, _c;
     return __awaiter(this, void 0, void 0, function () {
-        var frontierCrawler, initializeStatusReturn, _d, frontierCrawler_1, frontierCrawler_1_1, nanoBlockStatusReturn, nanoBlock, assetBlock, e_1_1, error_1;
+        var crawl_account, frontierCrawler, initializeStatusReturn, _d, frontierCrawler_1, frontierCrawler_1_1, nanoBlockStatusReturn, nanoBlock, assetBlock, e_1_1, error_1;
         return __generator(this, function (_e) {
             switch (_e.label) {
                 case 0:
-                    frontierCrawler = new nano_account_forward_crawler_1.NanoAccountForwardCrawler(nanoNode, assetCrawler.frontier.owner, assetCrawler.frontier.block_hash, "1");
+                    crawl_account = assetCrawler.frontier.owner;
+                    frontierCrawler = new nano_account_forward_crawler_1.NanoAccountForwardCrawler(nanoNode, crawl_account, assetCrawler.frontier.block_hash, "1");
                     _e.label = 1;
                 case 1:
                     _e.trys.push([1, 15, , 16]);
@@ -87,7 +88,7 @@ function ownedCrawl(nanoNode, assetCrawler) {
                         assetCrawler.traceLength += BigInt(1);
                         assetCrawler.head = nanoBlock.hash;
                         assetCrawler.headHeight = parseInt(nanoBlock.height);
-                        assetBlock = toAssetBlock(assetCrawler, nanoBlock);
+                        assetBlock = toAssetBlock(assetCrawler, nanoBlock, crawl_account);
                         if (assetBlock === undefined) {
                             return [3 /*break*/, 6];
                         }
@@ -130,7 +131,7 @@ function ownedCrawl(nanoNode, assetCrawler) {
     });
 }
 exports.ownedCrawl = ownedCrawl;
-function toAssetBlock(assetCrawler, block) {
+function toAssetBlock(assetCrawler, block, crawl_account) {
     if (block.type !== 'state') {
         return undefined;
     }
@@ -157,7 +158,7 @@ function toAssetBlock(assetCrawler, block) {
                 block_link: block.link,
                 block_hash: block.hash,
                 block_height: block.height,
-                block_account: block.account,
+                block_account: crawl_account,
                 block_representative: block.representative,
                 block_type: block.type,
                 block_subtype: block.subtype,
@@ -185,7 +186,7 @@ function toAssetBlock(assetCrawler, block) {
                 block_link: block.link,
                 block_hash: block.hash,
                 block_height: block.height,
-                block_account: block.account,
+                block_account: crawl_account,
                 block_representative: block.representative,
                 block_type: block.type,
                 block_subtype: block.subtype,
